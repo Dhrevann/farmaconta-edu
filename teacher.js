@@ -56,6 +56,9 @@ $('#teacher-remove').addEventListener('click',()=>enroll(false));
 $('#teacher-export').addEventListener('click',csv);
 $('#teacher-rows').addEventListener('click',ev=>{const a=ev.target.closest('[data-id]');if(a)inspect(a.dataset.id);});
 $('#teacher-form').addEventListener('submit',grade);
+window.FarmaTeacherGetRows=()=>rows;
+window.FarmaTeacherRefresh=refresh;
+window.FarmaTeacherImport?.install();
 }
 async function probe(){
 if(enabled||!window.farmaSupabaseClient||!document.body.classList.contains('app-ready'))return;
