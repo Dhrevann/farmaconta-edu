@@ -15,6 +15,13 @@ const glossary={
  'capital inicial':['Recursos aportados al inicio de la simulación.','Capital = efectivo inicial + valor del inventario inicial.'],
  'efectivo inicial':['Dinero disponible en caja al comenzar el ejercicio.','Efectivo inicial + cobros − pagos = efectivo final (modelo simplificado).'],
  'inventario valorizado':['Valor de las existencias a su costo de adquisición simulado.','Valor = Σ (unidades disponibles × costo unitario).'],
+ 'fijo':['Costo que no depende directamente del número de unidades vendidas durante un periodo de referencia.','Los gastos fijos se mantienen en el periodo definido.'],
+ 'variable':['Costo que cambia con la cantidad de unidades o ventas del ejercicio.','Costo variable total = unidades × costo variable unitario.'],
+ 'caja y bancos':['Cuenta de activo que reúne efectivo y fondos disponibles.','Saldo = importe inicial + cobros − pagos en este caso didáctico.'],
+ 'mercaderías':['Cuenta de activo que representa productos destinados a la venta.','Valor = unidades × costo unitario.'],
+ 'agotado':['Estado de un artículo con cero unidades disponibles.','Stock disponible = 0.'],
+ 'desactivar':['Retirar un producto de nuevas ventas sin eliminar su historial.','El stock histórico y los comprobantes permanecen.'],
+ 'eliminar':['Quitar del catálogo un registro sin ventas anteriores.','Solo se elimina definitivamente un producto sin ventas registradas.'],
  'costo unitario':['Importe de adquisición asignado a una unidad de producto.','Costo de ventas = Σ (unidades vendidas × costo unitario).'],
  'costo de ventas':['Costo asignado a las unidades que salieron por ventas.','Costo vendido = Σ (cantidad vendida × costo unitario).'],
  'gastos operativos':['Egresos por la operación del establecimiento; aquí se clasifican en fijos y variables.','Resultado operativo = ingresos netos − costo de ventas − gastos operativos.'],
@@ -123,7 +130,7 @@ function answerRow(q,panel,record){
  const help=helpButton(q.term||'toma de decisiones');
  if(q.type==='written')return '<label class="learn-label">Justificación y propuesta '+help+'</label><textarea class="learn-response" rows="5" maxlength="3000" placeholder="Escribe tu análisis y las razones de tus decisiones...">'+safe(prior||'')+'</textarea>';
  if(q.type==='number')return '<label class="learn-label">Respuesta numérica (sin unidades) '+help+'</label><input class="learn-response" type="text" inputmode="decimal" autocomplete="off" placeholder="Ej.: 118,50" value="'+safe(prior??'')+'">';
- return '<fieldset class="learn-options"><legend>Elige una respuesta '+help+'</legend>'+options.map((option,i)=>'<label class="learn-option"><input type="radio" name="learning-'+safe(panel.section)+'" class="learn-choice" value="'+i+'" '+(prior===option?'checked':'')+'><span>'+safe(option)+'</span>'+helpButton(q.term||'toma de decisiones')+'</label>').join('')+'</fieldset>';
+ return '<fieldset class="learn-options"><legend>Elige una respuesta '+help+'</legend>'+options.map((option,i)=>'<label class="learn-option"><input type="radio" name="learning-'+safe(panel.section)+'" class="learn-choice" value="'+i+'" '+(prior===option?'checked':'')+'><span>'+safe(option)+'</span>'+helpButton(findTerm(option)||q.term||'toma de decisiones')+'</label>').join('')+'</fieldset>';
 }
 function feedback(q,panel,record){
  if(!record || panel.mode==='evaluation')return '';
@@ -195,6 +202,15 @@ function pdfOwn(){
   const records=answered.filter(x=>x.q.module===m);if(!records.length)continue;
   body+='<h2>'+safe(modules[m])+'</h2>';
   records.forEach(({q,r},i)=>{body+='<div class="avoid-break"><p><b>'+(i+1)+'. '+safe(r.prompt||q.prompt)+'</b><br>Mi respuesta: '+safe(r.answer)+'<br>Resultado: '+(r.correct?'Correcta':'Por revisar')+'<br>Solución: '+safe(String(r.solution??q.answer))+'<br><i>Explicación:</i> '+safe(r.explanation||q.explanation)+'</p></div>';});
+ }
+ if(p.attempts.length){
+  body+='<h2>Historial detallado de evaluaciones terminadas</h2>';
+  p.attempts.forEach((att,n)=>{
+    body+='<h3>Evaluación '+(n+1)+' · '+safe(modules[att.module])+' · '+att.score+'/20</h3>';
+    (att.records||[]).forEach((rec,i)=>{
+      body+='<div class="avoid-break"><p><b>'+(i+1)+'. '+safe(rec.prompt)+'</b><br>Respuesta registrada: '+safe(rec.answer)+'<br>Resultado: '+(rec.correct?'Correcta':'Incorrecta')+'<br>Solución: '+safe(String(rec.solution))+'<br>Explicación: '+safe(rec.explanation)+'</p></div>';
+    });
+  });
  }
  if(written.length){body+='<h2>Análisis y decisiones abiertos</h2>';written.forEach((r,i)=>{body+='<div class="avoid-break"><p><b>Actividad '+(i+1)+':</b> '+safe(r.prompt)+'<br><b>Mi respuesta:</b> '+safe(r.answer)+'<br><i>Actividad sujeta a revisión docente.</i></p></div>';});}
  host.print(body);
