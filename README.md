@@ -119,7 +119,7 @@ Estas funcionalidades están en la rama `mejora/02-ticket-e-inventario` hasta ap
 - **Modo desafío:** un cálculo personalizado y **tres casos abiertos** por temática, vinculados a indicadores de **tu farmacia actual**: 5 cálculos y 15 análisis adicionales. Los casos abiertos requieren evaluación docente. El caso abierto es para revisión docente, sin nota automática.
 - **Modo evaluación:** 10 preguntas aleatorias de la temática; muestra una nota formativa de **0 a 20** al finalizar. No constituye un examen supervisado o antifraude, porque las preguntas se entregan públicamente al navegador.
 - **Panel de progreso** en Inicio, con acceso directo a cada bloque.
-- **Reportes PDF desde impresión de navegador**: «Mis respuestas» incluye preguntas contestadas, respuestas, explicaciones, evaluaciones terminadas y análisis abiertos; «Solucionario» incluye las 100 preguntas y sus soluciones con método de cálculo. En el diálogo de impresión seleccionar **Guardar como PDF**.
+- **PDF de respuestas individuales** desde el navegador: «Mis respuestas» incluye preguntas contestadas, retroalimentación, evaluaciones terminadas y análisis abiertos. **No se muestra ni genera un solucionario general en la plataforma estudiantil.** En el diálogo de impresión selecciona **Guardar como PDF**.
 
 ### Uso docente (flujo recomendado)
 
@@ -127,7 +127,7 @@ Estas funcionalidades están en la rama `mejora/02-ticket-e-inventario` hasta ap
 2. Sesión 10: emitir comprobantes ficticios y resolver **Ventas**.
 3. Sesión 11: ajustar inventario, visualizar libro diario/mayor, resolver **Inventario** y **Contabilidad**.
 4. Sesión 12: analizar reportes, resolver **Reportes** y completar **Desafío de mi farmacia**.
-5. Cada estudiante imprime el **PDF de sus respuestas** como evidencia. El **solucionario completo** es material de estudio y deberá usarse según las reglas de clase.
+5. Cada estudiante imprime únicamente el **PDF de sus respuestas** como evidencia; no tiene un botón de solucionario general.
 
 ### Persistencia y privacidad
 
