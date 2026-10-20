@@ -1,30 +1,29 @@
-# FarmaConta EDU 3.0 · Versión piloto integrada
+# FarmaConta EDU 3.1.0 · Cierre técnico y manuales
 
-**Estado (20/10/2026):** código integrado en `main`. Las tres migraciones de Supabase se aplicaron satisfactoriamente al proyecto FCE y se habilitó un usuario docente. Se conservaron los datos anteriores mediante un respaldo preactualización y las pruebas automatizadas GitHub Actions aprobaron.
+**Estado:** código funcional de III Unidad integrado en GitHub; auditoría 3.1.0 en curso. El proyecto FCE de Supabase tiene instaladas las migraciones 03, 04, 05 y 06, más los ajustes de seguridad de transición y el índice de auditoría 07. **No ejecutar de nuevo estos SQL en FCE.**
 
-**Aún por verificar en el navegador y con alumnos reales:** disponibilidad final de GitHub Pages, panel docente, impresión PDF, acceso móvil, persistencia entre dispositivos y carga simultánea de 30 estudiantes. No se declara certificada para operación masiva hasta completar el protocolo de aceptación.
+**Alcance académico:** simulación de una farmacia ficticia, cuentas individuales, inventario, compras de práctica, Kardex al costo fijo, ventas y documentos sin valor tributario, gastos, diario/mayor, 100 preguntas formativas, exámenes numéricos corregidos en servidor, panel docente con matrícula CSV/TXT, seguimiento y PDF.
 
-## Documentación de implementación
-Consulta la [Guía docente y estudiantil 3.0](docs/GUIA_DOCENTE_ESTUDIANTE_3_0.md) y la [auditoría de cierre](docs/AUDITORIA_CIERRE_3_0.md).
+### Manuales de uso y cierre
 
-Las migraciones forman parte del repositorio para facilitar instalaciones futuras; **en el proyecto FCE ya se ejecutaron y no hay que repetirlas**:
+- [Manual del estudiante 3.1.0](docs/MANUAL_ESTUDIANTE_3_1_0.md)
+- [Manual docente 3.1.0](docs/MANUAL_DOCENTE_3_1_0.md)
+- [Acta de auditoría y protocolo para 30 participantes](docs/ACTA_CIERRE_3_1_0.md)
+- [Documentación técnica original 3.0](docs/GUIA_DOCENTE_ESTUDIANTE_3_0.md)
 
-1. [03_docente.sql](sql/03_docente.sql)
-2. [04_evaluacion_servidor.sql](sql/04_evaluacion_servidor.sql)
-3. [05_backups.sql](sql/05_backups.sql)
+**Pruebas:** `node --test tests/*.mjs`. Los tests comprueban reglas contables y código, pero **no sustituyen** un ensayo real con 30 estudiantes ni la validación pedagógica de los reactivos.
 
-No publiques credenciales, direcciones privadas de estudiantes ni contraseñas en este repositorio.
+**Versión pública:** https://dhrevann.github.io/farmaconta-edu/
 
-## FarmaConta EDU 3.1 · Importación masiva de matrícula
+### Estado de Supabase
 
-En **Panel docente → Importar estudiantes por correo** puedes subir CSV/TXT (incluidos archivos exportados desde Excel), pegar correos, revisar válidos/duplicados/ya matriculados, descargar una plantilla y confirmar las matrículas.
+- Cuenta docente activada; matrícula individual y por archivo autorizadas solo mediante funciones protegidas.
+- Respaldos internos y recuperaciones basadas en JSON disponibles.
+- Un índice adicional de rendimiento (`sql/07_indice_auditoria.sql`) se aplicó sin borrar información.
+- Las advertencias de Security Advisors sobre funciones `SECURITY DEFINER` se revisan función a función: su exposición a autenticados es intencional donde existe comprobación de propietario o rol. Las advertencias no se consideran resueltas automáticamente.
+- El sistema utiliza Google OAuth. Si en el futuro se habilita inicio por contraseña, revisar la protección contra contraseñas filtradas.
 
-- **Hasta 300 correos únicos por importación** desde la interfaz; la base de datos verifica otra vez el rol docente y todos los correos recibidos.
-- Requiere migración nueva `sql/06_matricula_masiva.sql` (no vuelve a ejecutar las migraciones 03–05).
-- Solo crea matrículas en `class_enrollments`; los alumnos inician sesión con Google y configuran su propia farmacia.
-- No se envían invitaciones automáticas, no se crean contraseñas y no se modifican los trabajos preexistentes.
-- Los errores se muestran antes de importar y los registros ya matriculados no se duplican.
-
+---
 
 ## Funcionalidades nuevas
 - Panel docente de matrícula, revisión de análisis, calificación y exportación CSV.
@@ -35,7 +34,7 @@ En **Panel docente → Importar estudiantes por correo** puedes subir CSV/TXT (i
 - Reintentos automáticos de guardado al recuperar conexión.
 - Pruebas automáticas estáticas mediante Node.js y Actions.
 
-**No se considera verificada la capacidad de 30 usuarios ni la seguridad real de la migración hasta completar el protocolo de aceptación.**
+**No se considera certificada la capacidad de 30 usuarios hasta completar el protocolo de aceptación con evidencia de clase.**
 
 ---
 
