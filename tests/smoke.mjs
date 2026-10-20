@@ -27,7 +27,7 @@ test('Los módulos principales contienen funciones de inventario, comprobantes, 
  assert.match(s,/src="\.\/teacher\.js"/);
 });
 test('Cada complemento de navegador pasa la compilación JS',()=>{
- for(const name of ['teacher.js','backup-ui.js','secure-exam.js','inventory-extension.js','student-feedback.js','learning.js'])assert.doesNotThrow(()=>new vm.Script(load(name)),name);
+ for(const name of ['teacher.js','teacher-import.js','backup-ui.js','secure-exam.js','inventory-extension.js','student-feedback.js','learning.js'])assert.doesNotThrow(()=>new vm.Script(load(name)),name);
 });
 test('Las migraciones protegen roles, evaluaciones y respaldos',()=>{
  const teacher=load('sql/03_docente.sql'),exam=load('sql/04_evaluacion_servidor.sql'),backup=load('sql/05_backups.sql');
@@ -49,4 +49,32 @@ test('Compra al costo fijo: registro contable y stock conservan la partida doble
  const newCash=initialCash-purchases,newStock=(initialStock+quantity)*unitCost;
  assert.equal(newCash+newStock,initialCash+initialStock*unitCost);
  assert.equal(purchases,purchases); // Debe mercaderías = Haber caja
+});
+
+test('Importador docente: lee CSV de Excel y TXT, detecta duplicados sin matricularlos dos veces',()=>{
+ const window={};
+ vm.runInNewContext(load('teacher-import.js'),{window,document:{}});
+ const parse=window.FarmaBulkEmailParser.parse;
+ const csv='Nombre;Correo electrónico;Sección\\nAna;ana@example.edu.pe;A\\nBruno;bruno@example.edu.pe;A';
+ const first=parse(csv);
+ assert.equal(first.stats.new,2);
+ assert.deepEqual(Array.from(first.unique),['ana@example.edu.pe','bruno@example.edu.pe']);
+ const second=parse('correo\\nana@example.edu.pe\\nana@example.edu.pe\\nbruno@example.edu.pe\\ncorreo_mal',
+ ['bruno@example.edu.pe']);
+ assert.equal(second.stats.new,1);
+ assert.equal(second.stats.existing,1);
+ assert.equal(second.stats.duplicates,1);
+ assert.equal(second.stats.invalid,1);
+ assert.equal(parse('uno@example.edu.pe,dos@example.edu.pe').stats.new,2);
+ assert.equal(parse('"Email","Nombre"\\n"c@example.com","Alumno, C"').stats.new,1);
+});
+test('Matrícula masiva: servidor verifica docente, tamaño, correos y evita duplicados',()=>{
+ const sql=load('sql/06_matricula_masiva.sql');
+ assert.match(sql,/public\\.farma_is_teacher\\(\\)/);
+ assert.match(sql,/INVALID_BATCH_SIZE/);
+ assert.match(sql,/INVALID_EMAIL_LIST/);
+ assert.match(sql,/on conflict \\(email\\) do nothing/);
+ assert.match(sql,/revoke all on function public\\.farma_teacher_bulk_enrollment\\(text\\[\\]\\) from public,anon,authenticated/);
+ const html=load('index.html');
+ assert.match(html,/teacher-import\\.js/);
 });
