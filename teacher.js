@@ -25,12 +25,15 @@ const {error}=await db.rpc('farma_teacher_enrollment',{p_email:email,p_enabled:a
 if(error){status('Error: '+error.message);return;}$('#teacher-email').value='';await refresh();
 }
 async function inspect(id){
-const {data,error}=await db.rpc('farma_teacher_student',{p_student:id});
+const [{data,error},{data:secureGrades,error:secureError}]=await Promise.all([
+ db.rpc('farma_teacher_student',{p_student:id}),
+ db.rpc('farma_teacher_secure_exams',{p_student:id})
+]);
 if(error){status('Error: '+error.message);return;}student=id;
 const st=data||{},analysis=st.learning||{};
 $('#teacher-detail').hidden=false;
 $('#teacher-student-title').textContent='Revisión de '+(st.pharmacy?.student||rows.find(r=>r.user_id===id)?.email||'estudiante');
-$('#teacher-detail-body').innerHTML=`<p><b>Farmacia:</b> ${h(st.pharmacy?.name)} · <b>Ventas:</b> ${(st.sales||[]).length} · <b>Gastos:</b> ${(st.expenses||[]).length}</p><h3>Análisis final</h3><p>${h(st.analysis||'Pendiente')}</p><h3>Casos abiertos</h3>${Object.values(analysis.written||{}).map(x=>`<blockquote><b>${h(x.prompt)}</b><p>${h(x.answer)}</p></blockquote>`).join('')||'<p>Pendientes</p>'}<h3>Evaluaciones formativas</h3><p>${(analysis.attempts||[]).map(x=>h(x.module)+': '+Number(x.score)+'/20').join(' · ')||'Sin evaluaciones'}</p>`;
+$('#teacher-detail-body').innerHTML=`<p><b>Farmacia:</b> ${h(st.pharmacy?.name)} · <b>Ventas:</b> ${(st.sales||[]).length} · <b>Gastos:</b> ${(st.expenses||[]).length}</p><h3>Análisis final</h3><p>${h(st.analysis||'Pendiente')}</p><h3>Casos abiertos</h3>${Object.values(analysis.written||{}).map(x=>`<blockquote><b>${h(x.prompt)}</b><p>${h(x.answer)}</p></blockquote>`).join('')||'<p>Pendientes</p>'}<h3>Evaluaciones formativas</h3><p>${(analysis.attempts||[]).map(x=>h(x.module)+': '+Number(x.score)+'/20').join(' · ')||'Sin evaluaciones'}</p><h3>Evaluaciones de servidor</h3><p>${Array.isArray(secureGrades)&&secureGrades.length?secureGrades.map(x=>h(x.module)+': '+Number(x.score)+'/20').join(' · '):(secureError?'Migración 04 pendiente':'Sin exámenes entregados')}</p>`;
 $('#teacher-detail').scrollIntoView({behavior:'smooth'});
 }
 async function grade(ev){ev.preventDefault();if(!student)return;
