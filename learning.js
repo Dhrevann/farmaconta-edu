@@ -116,9 +116,40 @@ function challengeQuestions(module){
  reportes:{prompt:'Con tus operaciones ACTUALES, ¿cuál es el resultado operativo estimado (S/)?',answer:Math.round((net-cost-spent)*100)/100,explanation:'Ingresos netos − costo de ventas − gastos = '+pen(net)+' − '+pen(cost)+' − '+pen(spent)+' = '+pen(net-cost-spent)+'.'}
  };
  const b=baselines[module];
+ const scenarios={
+  finanzas:[
+   'Tus ingresos netos actuales son '+pen(net)+' y tus gastos '+pen(spent)+'. Distingue dos posibles costos fijos y dos variables de una botica e indica cómo vigilarías cada uno.',
+   'El efectivo ficticio disponible es '+pen(st+total-spent)+'. Propón una medida financiera prudente y una señal que indicaría que debes revisarla.',
+   'Con ventas acumuladas '+pen(total)+', explica por qué vender más no garantiza necesariamente un mayor resultado operativo.'
+  ],
+  ventas:[
+   'Con '+sales.length+' comprobantes simulados, explica dos criterios para distinguir factura, boleta y nota de venta interna. ¿Por qué ninguno de nuestros archivos tiene validez SUNAT?',
+   'Analiza el efecto de conceder descuentos frecuentes: ¿qué cambia en ingresos, margen e inventario? Propón una comprobación antes de vender.',
+   'Imagina que se emitió una factura simulada con documento ficticio de longitud incorrecta. Describe cómo identificar y corregir el error antes de registrar la operación.'
+  ],
+  inventario:[
+   'Tu farmacia tiene '+stockUnits+' unidades y existencias valorizadas en '+pen(stockVal)+'. Explica cómo decidirías qué productos reponer primero y qué otros datos necesitarías.',
+   'Un producto ficticio con ventas anteriores será retirado del catálogo. Justifica por qué debe desactivarse sin borrar el historial y qué controles verificarías.',
+   'Describe cómo una diferencia entre stock registrado y stock físico ficticio puede afectar el reporte financiero. Propón dos verificaciones.'
+  ],
+  contabilidad:[
+   'La farmacia registra '+sales.length+' ventas y '+expenses.length+' gastos. Describe los asientos que genera una venta al contado gravada e identifica por qué hay un asiento separado de costo de ventas.',
+   'Explica con un ejemplo cómo comprobarías que Debe y Haber cuadran y por qué esa igualdad no asegura por sí sola un registro correcto.',
+   'Si se corrige un costo unitario después de una venta, ¿qué riesgos aparecen para el libro diario, el mayor y el balance? Propón un control.'
+  ],
+  reportes:[
+   'Resultado operativo actual: '+pen(net-cost-spent)+'. Propón dos decisiones fundamentadas para mejorar la gestión e indica cómo medirías sus resultados.',
+   'Compara ventas '+pen(total)+', gastos '+pen(spent)+' y existencias '+pen(stockVal)+'. ¿Qué conclusiones serían justificables y qué información adicional necesitas?',
+   'Redacta una conclusión de cierre para la III Unidad que relacione comprobantes, inventario, libros y rentabilidad sin confundir ingresos con utilidad.'
+  ]
+ };
+ const rubric='Revisión docente: cada caso se valora de 0 a 20 según indicadores utilizados (5 puntos), razonamiento (5), decisiones viables (5) y claridad (5). No existe corrección automática.';
  return [
  {id:'DX-'+module,module,type:'number',prompt:b.prompt,answer:b.answer,explanation:b.explanation,term:'resultado operativo',level:'Caso personalizado'},
- {id:'DR-'+module,module,type:'written',prompt:'Analiza la situación de tu farmacia: ventas acumuladas '+pen(total)+', gastos '+pen(spent)+', '+stockUnits+' unidades en inventario y resultado '+pen(net-cost-spent)+'. Propón DOS decisiones razonadas y justifica cómo evaluarías su efecto.',answer:'Evaluación docente mediante rúbrica: uso de indicadores, relación causa-efecto, viabilidad y claridad.',explanation:'Rúbrica orientativa: 0–5 puntos por indicador correcto, argumentación, propuesta factible y criterio de seguimiento. La respuesta abierta NO se califica automáticamente.',term:'toma de decisiones',level:'Análisis abierto'}
+ ...scenarios[module].map((prompt,i)=>({
+  id:'DR-'+module+'-'+(i+1),module,type:'written',prompt,
+  answer:rubric,explanation:rubric,term:'toma de decisiones',level:'Análisis abierto'
+ }))
  ];
 }
 function panelState(element){
@@ -256,7 +287,7 @@ function renderOverview(){
    const percent=Math.round(summary.attempted/summary.total*100);
    return '<div class="learn-overview-row"><div><b>'+safe(modules[m])+'</b><small>'+summary.attempted+'/'+summary.total+' realizadas · '+summary.correct+' correctas</small><div class="learn-progress"><span style="width:'+percent+'%"></span></div></div><button type="button" data-view="'+safe(section)+'" class="btn mini outline">Practicar</button></div>';
  }).join('');
- box.innerHTML='<div class="learn-eyebrow">MI APRENDIZAJE · III UNIDAD</div><h2>Progreso de actividades y conceptos</h2><p>100 preguntas con explicación, cinco casos de tu farmacia y evaluaciones formativas sobre 20 puntos.</p>'+rows;
+ box.innerHTML='<div class="learn-eyebrow">MI APRENDIZAJE · III UNIDAD</div><h2>Progreso de actividades y conceptos</h2><p>100 preguntas, 5 cálculos personalizados, 15 casos abiertos y evaluaciones formativas sobre 20 puntos.</p>'+rows;
 }
 function renderAll(){blocks.forEach(([section])=>renderPanel(section));renderOverview();annotateHelp();}
 function start(){
