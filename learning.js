@@ -19,6 +19,7 @@ const glossary={
  'variable':['Costo que cambia con la cantidad de unidades o ventas del ejercicio.','Costo variable total = unidades × costo variable unitario.'],
  'caja y bancos':['Cuenta de activo que reúne efectivo y fondos disponibles.','Saldo = importe inicial + cobros − pagos en este caso didáctico.'],
  'mercaderías':['Cuenta de activo que representa productos destinados a la venta.','Valor = unidades × costo unitario.'],
+ 'inactivo':['Producto conservado en el catálogo y el historial, pero no disponible para nuevas ventas.','Puede reactivarse sin borrar sus comprobantes anteriores.'],
  'agotado':['Estado de un artículo con cero unidades disponibles.','Stock disponible = 0.'],
  'desactivar':['Retirar un producto de nuevas ventas sin eliminar su historial.','El stock histórico y los comprobantes permanecen.'],
  'eliminar':['Quitar del catálogo un registro sin ventas anteriores.','Solo se elimina definitivamente un producto sin ventas registradas.'],
