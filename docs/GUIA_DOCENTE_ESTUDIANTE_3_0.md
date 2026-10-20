@@ -26,6 +26,13 @@ on conflict (email) do nothing;
 
 ## Recorrido docente
 - **Panel docente → Matricular:** registra el correo Google del alumno; las contraseñas no se solicitan.
+- **Panel docente → Importar estudiantes por correo:** descarga la plantilla CSV o utiliza un archivo CSV/TXT exportado de Excel. Se admite una columna `Correo`, `Correo electrónico` o `Email`; también puedes pegar un correo por línea.
+  1. Selecciona el archivo o pega los correos en el cuadro.
+  2. Pulsa **Revisar correos** para conocer cuántos son nuevos, ya matriculados, duplicados o inválidos.
+  3. Revisa la vista previa y pulsa **Confirmar matrículas**; la base de datos verificará otra vez tu rol docente.
+  4. Máximo **300 direcciones únicas por lote**. Los alumnos ya inscritos no se duplican, y se omiten los correos inválidos después de mostrarlos en el resumen.
+  5. La matrícula **no genera contraseñas ni envía invitaciones automáticas**: comparte el enlace de FarmaConta EDU por los canales habituales de clase. Cada alumno debe iniciar sesión con el mismo Google autorizado y configurar por sí mismo su farmacia.
+  6. No se crean cuentas de Google ni se sobrescribe ninguna farmacia al importar correos.
 - **Revocar:** impide entrar al trabajo, pero **no borra el workspace**, lo que permite recuperar la matrícula.
 - **Revisar:** carga solo lectura del avance y análisis del alumno elegido.
 - **Nota y retroalimentación:** guarda una evaluación del profesor separada del trabajo del alumno.

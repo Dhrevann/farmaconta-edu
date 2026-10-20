@@ -15,6 +15,17 @@ Las migraciones forman parte del repositorio para facilitar instalaciones futura
 
 No publiques credenciales, direcciones privadas de estudiantes ni contraseñas en este repositorio.
 
+## FarmaConta EDU 3.1 · Importación masiva de matrícula
+
+En **Panel docente → Importar estudiantes por correo** puedes subir CSV/TXT (incluidos archivos exportados desde Excel), pegar correos, revisar válidos/duplicados/ya matriculados, descargar una plantilla y confirmar las matrículas.
+
+- **Hasta 300 correos únicos por importación** desde la interfaz; la base de datos verifica otra vez el rol docente y todos los correos recibidos.
+- Requiere migración nueva `sql/06_matricula_masiva.sql` (no vuelve a ejecutar las migraciones 03–05).
+- Solo crea matrículas en `class_enrollments`; los alumnos inician sesión con Google y configuran su propia farmacia.
+- No se envían invitaciones automáticas, no se crean contraseñas y no se modifican los trabajos preexistentes.
+- Los errores se muestran antes de importar y los registros ya matriculados no se duplican.
+
+
 ## Funcionalidades nuevas
 - Panel docente de matrícula, revisión de análisis, calificación y exportación CSV.
 - Compras ficticias al contado, lote/vencimiento registrado y Kardex básico por producto.
