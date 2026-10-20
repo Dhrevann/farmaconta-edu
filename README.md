@@ -1,16 +1,19 @@
-# FarmaConta EDU 3.0 · Cierre funcional (candidato)
+# FarmaConta EDU 3.0 · Versión piloto integrada
 
-**Importante:** esta versión está en la rama `release/3-0-consolidacion` y aún requiere ejecutar y verificar tres migraciones en Supabase. No mezclar el estado de la rama con el sitio ya publicado en GitHub Pages.
+**Estado (20/10/2026):** código integrado en `main`. Las tres migraciones de Supabase se aplicaron satisfactoriamente al proyecto FCE y se habilitó un usuario docente. Se conservaron los datos anteriores mediante un respaldo preactualización y las pruebas automatizadas GitHub Actions aprobaron.
 
-## Guía de activación
-Abre [Guía docente y estudiantil 3.0](docs/GUIA_DOCENTE_ESTUDIANTE_3_0.md) antes de integrar esta rama.
-Ejecuta en Supabase SQL Editor, por orden:
+**Aún por verificar en el navegador y con alumnos reales:** disponibilidad final de GitHub Pages, panel docente, impresión PDF, acceso móvil, persistencia entre dispositivos y carga simultánea de 30 estudiantes. No se declara certificada para operación masiva hasta completar el protocolo de aceptación.
+
+## Documentación de implementación
+Consulta la [Guía docente y estudiantil 3.0](docs/GUIA_DOCENTE_ESTUDIANTE_3_0.md) y la [auditoría de cierre](docs/AUDITORIA_CIERRE_3_0.md).
+
+Las migraciones forman parte del repositorio para facilitar instalaciones futuras; **en el proyecto FCE ya se ejecutaron y no hay que repetirlas**:
 
 1. [03_docente.sql](sql/03_docente.sql)
 2. [04_evaluacion_servidor.sql](sql/04_evaluacion_servidor.sql)
 3. [05_backups.sql](sql/05_backups.sql)
 
-Después matricula y habilita tu correo como docente siguiendo la guía; nunca publiques correos privados o credenciales en GitHub.
+No publiques credenciales, direcciones privadas de estudiantes ni contraseñas en este repositorio.
 
 ## Funcionalidades nuevas
 - Panel docente de matrícula, revisión de análisis, calificación y exportación CSV.
