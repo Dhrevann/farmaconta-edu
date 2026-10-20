@@ -55,26 +55,25 @@ test('Importador docente: lee CSV de Excel y TXT, detecta duplicados sin matricu
  const window={};
  vm.runInNewContext(load('teacher-import.js'),{window,document:{}});
  const parse=window.FarmaBulkEmailParser.parse;
- const csv='Nombre;Correo electrónico;Sección\\nAna;ana@example.edu.pe;A\\nBruno;bruno@example.edu.pe;A';
+ const csv=['Nombre;Correo electrónico;Sección','Ana;ana@example.edu.pe;A','Bruno;bruno@example.edu.pe;A'].join(String.fromCharCode(10));
  const first=parse(csv);
  assert.equal(first.stats.new,2);
  assert.deepEqual(Array.from(first.unique),['ana@example.edu.pe','bruno@example.edu.pe']);
- const second=parse('correo\\nana@example.edu.pe\\nana@example.edu.pe\\nbruno@example.edu.pe\\ncorreo_mal',
- ['bruno@example.edu.pe']);
+ const second=parse(['correo','ana@example.edu.pe','ana@example.edu.pe','bruno@example.edu.pe','correo_mal'].join(String.fromCharCode(10)),['bruno@example.edu.pe']);
  assert.equal(second.stats.new,1);
  assert.equal(second.stats.existing,1);
  assert.equal(second.stats.duplicates,1);
  assert.equal(second.stats.invalid,1);
  assert.equal(parse('uno@example.edu.pe,dos@example.edu.pe').stats.new,2);
- assert.equal(parse('"Email","Nombre"\\n"c@example.com","Alumno, C"').stats.new,1);
+ assert.equal(parse(['"Email","Nombre"','"c@example.com","Alumno, C"'].join(String.fromCharCode(10))).stats.new,1);
 });
 test('Matrícula masiva: servidor verifica docente, tamaño, correos y evita duplicados',()=>{
  const sql=load('sql/06_matricula_masiva.sql');
- assert.match(sql,/public\\.farma_is_teacher\\(\\)/);
- assert.match(sql,/INVALID_BATCH_SIZE/);
- assert.match(sql,/INVALID_EMAIL_LIST/);
- assert.match(sql,/on conflict \\(email\\) do nothing/);
- assert.match(sql,/revoke all on function public\\.farma_teacher_bulk_enrollment\\(text\\[\\]\\) from public,anon,authenticated/);
+ assert.ok(sql.includes('public.farma_is_teacher()'));
+ assert.ok(sql.includes('INVALID_BATCH_SIZE'));
+ assert.ok(sql.includes('INVALID_EMAIL_LIST'));
+ assert.ok(sql.includes('on conflict (email) do nothing'));
+ assert.ok(sql.includes('revoke all on function public.farma_teacher_bulk_enrollment(text[]) from public,anon,authenticated'));
  const html=load('index.html');
- assert.match(html,/teacher-import\\.js/);
+ assert.ok(html.includes('src="./teacher-import.js"'));
 });
