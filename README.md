@@ -73,3 +73,34 @@ El Client Secret de Google se coloca SOLO en el dashboard privado de Supabase.
 - https://supabase.com/docs/guides/auth/social-login/auth-google
 - https://supabase.com/docs/guides/auth/redirect-urls
 - https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits
+
+## Mejoras propuestas: ticket térmico y catálogo editable
+
+Estas funcionalidades están en la rama `mejora/02-ticket-e-inventario` hasta aprobar la PR correspondiente.
+
+### Comprobante normal y ticket compacto
+- El comprobante A4 continúa abriéndose automáticamente después de completar una venta.
+- En **Punto de venta**, selecciona el ancho **58 mm** o **80 mm**.
+- En el **Historial de ventas**, cada operación tiene los botones **A4/PDF** y **Ticket/PDF**.
+- El ticket incluye logo (si lo subiste), nombre de farmacia, documento simulado, productos, totales y la advertencia **SIMULACIÓN ACADÉMICA · SIN VALIDEZ TRIBUTARIA**.
+- Para obtener el PDF, elige **Guardar como PDF** en el cuadro de impresión del navegador. El ancho y la altura son personalizados mediante CSS; algunas impresoras o navegadores requieren elegir manualmente un tamaño de papel equivalente para evitar recortes.
+
+### Catálogo editable por estudiante
+- En **Inventario**, el formulario permite **agregar y editar** producto, código, presentación, stock, costo y precio.
+- El código no se modifica al editar. El costo queda bloqueado si el producto tiene ventas previas, para proteger el registro contable histórico.
+- Los productos con ventas se **desactivan**, no se eliminan: conservan sus comprobantes y sus existencias valorizadas.
+- Los productos sin ventas se pueden **eliminar**, salvo que fueran el último producto del catálogo.
+- Los productos inactivos desaparecen del selector del punto de venta y pueden reactivarse posteriormente.
+- Para simplificar el contenido de la III Unidad, las nuevas existencias se tratan como **ajustes del inventario inicial ficticio**, no como compras con nuevos asientos. La aplicación recalcula el capital inicial didáctico. No debe utilizarse como software contable real.
+- Los cambios siguen usando el mismo espacio de trabajo de Supabase por estudiante, sin tablas nuevas ni migraciones SQL.
+
+### Lista de pruebas para la PR
+1. Generar A4 y ticket de 58 mm de una venta ficticia; repetir en 80 mm.
+2. Verificar que el PDF no corte el nombre, importe o aviso de simulación; revisar en celular.
+3. Agregar un producto con stock, vender dos unidades y verificar descenso de existencias.
+4. Intentar eliminar ese producto vendido; debe **desactivarse** y conservar el comprobante original.
+5. Reactivarlo, editar precio y stock, comprobar las sumas del balance.
+6. Crear y eliminar un producto que nunca tuvo ventas.
+7. Cerrar sesión, volver a entrar desde otro dispositivo y confirmar que los cambios se recuperan.
+8. Hacer un respaldo JSON antes de una prueba extensa con estudiantes.
+
