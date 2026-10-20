@@ -16,4 +16,4 @@ jobs:
         with:
           node-version: '22'
       - name: Comprobar estructura, preguntas y seguridad
-        run: node --test tests/smoke.mjs
+        run: node --test tests/*.mjs
