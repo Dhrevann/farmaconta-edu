@@ -108,9 +108,11 @@ function challengeQuestions(module){
  const net=sum(sales,x=>Number(x.net)||0),cost=sum(sales,x=>Number(x.cost)||0),spent=sum(expenses,x=>Number(x.amount)||0);
  const stockVal=sum(stock,x=>x.stock*x.cost);
  const total=sum(sales,x=>Number(x.total)||0);
+ const spentOnPurchases=sum(s.purchases||[],x=>Number(x.amount)||0);
+ const estimatedCash=Math.round((st+total-spent-spentOnPurchases)*100)/100;
  const stockUnits=sum(stock,x=>Number(x.stock)||0);
  const baselines={
- finanzas:{prompt:'Según los registros ACTUALES, ¿cuánto es el efectivo final estimado de tu botica (S/)?',answer:Math.round((st+total-spent)*100)/100,explanation:'Efectivo final = efectivo inicial + ventas cobradas − gastos pagados = '+pen(st)+' + '+pen(total)+' − '+pen(spent)+' = '+pen(st+total-spent)+'.'},
+ finanzas:{prompt:'Según los registros ACTUALES, ¿cuánto es el efectivo final estimado de tu botica (S/)?',answer:estimatedCash,explanation:'Efectivo final = efectivo inicial + ventas cobradas − gastos pagados − compras pagadas al contado = '+pen(st)+' + '+pen(total)+' − '+pen(spent)+' − '+pen(spentOnPurchases)+' = '+pen(estimatedCash)+'.'},
  ventas:{prompt:'Con las operaciones ACTUALES, ¿cuánto es el total acumulado de ventas simuladas (S/)?',answer:total,explanation:'Suma de los importes totales de todas las ventas registradas = '+pen(total)+'.'},
  inventario:{prompt:'Según el catálogo ACTUAL, ¿cuál es el inventario valorizado al costo (S/)?',answer:stockVal,explanation:'Se suman las unidades disponibles × costo unitario de todos los productos, incluidos los inactivos = '+pen(stockVal)+'.'},
  contabilidad:{prompt:'Con tu configuración ACTUAL, ¿cuál es el capital inicial simplificado (S/)?',answer:Math.round((st+sum(stock,x=>x.initialStock*x.cost))*100)/100,explanation:'Efectivo inicial + inventario inicial valorizado = '+pen(st+sum(stock,x=>x.initialStock*x.cost))+'.'},
@@ -120,7 +122,7 @@ function challengeQuestions(module){
  const scenarios={
   finanzas:[
    'Tus ingresos netos actuales son '+pen(net)+' y tus gastos '+pen(spent)+'. Distingue dos posibles costos fijos y dos variables de una botica e indica cómo vigilarías cada uno.',
-   'El efectivo ficticio disponible es '+pen(st+total-spent)+'. Propón una medida financiera prudente y una señal que indicaría que debes revisarla.',
+   'El efectivo ficticio disponible es '+pen(estimatedCash)+'. Propón una medida financiera prudente y una señal que indicaría que debes revisarla.',
    'Con ventas acumuladas '+pen(total)+', explica por qué vender más no garantiza necesariamente un mayor resultado operativo.'
   ],
   ventas:[
