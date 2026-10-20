@@ -414,7 +414,7 @@ function finalSubmissionPrint(){
  const rows=(state.sales||[]).map(s=>`<tr><td>${plain(dateLabel(s.date))}</td><td>${plain(saleCode(s))}</td><td>${plain(s.customer)}</td><td>${money(s.total)}</td></tr>`).join('');
  const answered=Object.entries(learning.answers||{}).map(([id,r])=>`<div class="avoid-break"><strong>${plain(id)}: ${plain(r.prompt||'Pregunta')}</strong><p>Respuesta: ${plain(r.answer)}<br>Resultado: ${r.correct?'Correcto':'Por revisar'}<br>Explicación: ${plain(r.explanation)}</p></div>`).join('');
  const essay=Object.values(learning.written||{}).map(x=>`<div class="avoid-break"><strong>${plain(x.prompt)}</strong><p>${plain(x.answer)}</p></div>`).join('');
- const assessments=(learning.attempts||[]).map(a=>`<tr><td>${plain(a.module)}</td><td>${plain(a.at?.slice(0,10))}</td><td>${a.score}/20</td></tr>`).join('');
+ const assessments=[...(learning.attempts||[]).map(a=>`<tr><td>${plain(a.module)} (práctica)</td><td>${plain(a.at?.slice(0,10))}</td><td>${a.score}/20</td></tr>`),...(window.farmaServerExamResults||[]).map(a=>`<tr><td>${plain(a.module)} (servidor)</td><td>${plain(a.submitted_at?.slice(0,10))}</td><td>${a.score}/20</td></tr>`)].join('');
  const page=`<h2>Entrega integral de la III Unidad · Simulación académica</h2>${bannerPrint()}<p>Estudiante: ${plain(p.student)} · Botica: ${plain(p.name)} · Generado: ${plain(new Date().toLocaleString('es-PE'))}</p>`;
  printHTML(page+financialPrint()+'<div class="pagebreak"></div>'+inventoryPrint()+'<div class="pagebreak"></div>'+booksPrint()+
  '<div class="pagebreak"></div><h2>Comprobantes simulados</h2><table class="print-table"><thead><tr><th>Fecha</th><th>Número</th><th>Cliente ficticio</th><th>Total</th></tr></thead><tbody>'+rows+'</tbody></table>'+
@@ -593,6 +593,7 @@ window.farmaLearningHost={
 <script src="./learning-bank.js"></script>
 <script src="./learning.js"></script>
 <script src="./inventory-extension.js"></script>
+<script src="./secure-exam.js" defer></script>
 <script type="module" src="./cloud.js"></script>
 <script src="./teacher.js" defer></script>
 </body>
