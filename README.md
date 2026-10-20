@@ -1,4 +1,31 @@
-# FarmaConta EDU 2.0 — inicio de la migración a la nube
+# FarmaConta EDU 3.0 · Cierre funcional (candidato)
+
+**Importante:** esta versión está en la rama `release/3-0-consolidacion` y aún requiere ejecutar y verificar tres migraciones en Supabase. No mezclar el estado de la rama con el sitio ya publicado en GitHub Pages.
+
+## Guía de activación
+Abre [Guía docente y estudiantil 3.0](docs/GUIA_DOCENTE_ESTUDIANTE_3_0.md) antes de integrar esta rama.
+Ejecuta en Supabase SQL Editor, por orden:
+
+1. [03_docente.sql](sql/03_docente.sql)
+2. [04_evaluacion_servidor.sql](sql/04_evaluacion_servidor.sql)
+3. [05_backups.sql](sql/05_backups.sql)
+
+Después matricula y habilita tu correo como docente siguiendo la guía; nunca publiques correos privados o credenciales en GitHub.
+
+## Funcionalidades nuevas
+- Panel docente de matrícula, revisión de análisis, calificación y exportación CSV.
+- Compras ficticias al contado, lote/vencimiento registrado y Kardex básico por producto.
+- Entrega académica integral PDF con comprobantes, libros y actividades.
+- Evaluación alternativa de diez preguntas numéricas por módulo, con nota validada en Supabase.
+- Versiones diarias del workspace, aisladas por estudiante, con descarga JSON.
+- Reintentos automáticos de guardado al recuperar conexión.
+- Pruebas automáticas estáticas mediante Node.js y Actions.
+
+**No se considera verificada la capacidad de 30 usuarios ni la seguridad real de la migración hasta completar el protocolo de aceptación.**
+
+---
+
+## Historia y configuración original
 
 ## Estado de preparación para GitHub Pages (20/10/2026)
 
@@ -6,7 +33,7 @@
 - **Código actualizado:** control de errores de sincronización; advertencia al abandonar la página con datos pendientes; rechazo de datos remotos incompatibles sin borrarlos.
 - **Pruebas locales simuladas:** dos usuarios independientes, escritura de estados, datos remotos incompatibles y error de red **superadas con un cliente Supabase simulado**.
 - **Pruebas reales pendientes:** inicio de sesión Google OAuth, filas RLS en Supabase, continuidad entre dispositivos, 30 usuarios concurrentes y exportación a PDF en dispositivos reales.
-- **GitHub Pages:** este repositorio permanece **privado**. En un plan GitHub Free, el administrador debe cambiarlo a público, revisar previamente la presencia de secretos y activar Pages desde **Settings → Pages → Deploy from a branch → main → /(root)**. En planes GitHub Pro puede conservarse privado.
+- **GitHub Pages:** este repositorio se publicó como **público**. En un plan GitHub Free, el administrador debe cambiarlo a público, revisar previamente la presencia de secretos y activar Pages desde **Settings → Pages → Deploy from a branch → main → /(root)**. En planes GitHub Pro puede conservarse privado.
 - Dirección prevista (aún no comprobada): https://dhrevann.github.io/farmaconta-edu/
 - **Supabase Authentication → URL Configuration:** `Site URL` y `Redirect URLs` deben incluir exactamente la URL anterior. Google Cloud debe tener como OAuth redirect el callback específico de Supabase, no la URL de GitHub.
 - **Antes de clase:** matricular correos autorizados desde el SQL Editor (nunca subirlos a GitHub), y probar con cuentas A/B que no puedan acceder a datos ajenos.
