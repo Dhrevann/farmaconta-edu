@@ -42,6 +42,7 @@ on conflict (email) do nothing;
 7. **Evaluación con servidor en Reportes:** hasta 3 intentos por módulo en 24 h, 60 minutos por intento; 10 cálculos únicos y nota sobre 20. Las respuestas concretas se guardan solo en PostgreSQL, no en el JavaScript de la prueba. No es un sistema antifraude invulnerable.
 8. **Reportes → Entrega final integral / PDF:** incluye resúmenes, inventario, libros y actividades, y notas de evaluación del servidor cargadas en la sesión.
 9. **Reportes → Copias diarias:** descargar JSON de una fecha anterior; si necesitas restaurar, utiliza la función de importación de respaldos ya existente después de verificar el archivo.
+10. **Reportes → Observaciones docentes:** el estudiante puede consultar únicamente sus calificaciones y retroalimentación mediante RLS; pulsa Actualizar después de que el profesor revise el trabajo.
 
 ## Rúbrica para respuestas abiertas (20 puntos)
 | Criterio | Puntaje |
