@@ -27,7 +27,7 @@ test('Los módulos principales contienen funciones de inventario, comprobantes, 
  assert.match(s,/src="\.\/teacher\.js"/);
 });
 test('Cada complemento de navegador pasa la compilación JS',()=>{
- for(const name of ['teacher.js','backup-ui.js','secure-exam.js','inventory-extension.js','learning.js'])assert.doesNotThrow(()=>new vm.Script(load(name)),name);
+ for(const name of ['teacher.js','backup-ui.js','secure-exam.js','inventory-extension.js','student-feedback.js','learning.js'])assert.doesNotThrow(()=>new vm.Script(load(name)),name);
 });
 test('Las migraciones protegen roles, evaluaciones y respaldos',()=>{
  const teacher=load('sql/03_docente.sql'),exam=load('sql/04_evaluacion_servidor.sql'),backup=load('sql/05_backups.sql');
