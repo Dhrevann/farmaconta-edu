@@ -17,6 +17,7 @@ async function history(){
  if(!db)return;
  const {data,error}=await db.rpc('farma_my_secure_exams');
  if(error){$('#server-exam-history').textContent='Disponible tras ejecutar sql/04_evaluacion_servidor.sql.';return;}
+ window.farmaServerExamResults=Array.isArray(data)?data:[];
  $('#server-exam-history').innerHTML=Array.isArray(data)&&data.length?data.map(x=>`<div class="note">${esc(x.module)} · ${x.score}/20 · ${esc(String(x.submitted_at).slice(0,10))}</div>`).join(''):'<p>Aún no se han entregado evaluaciones de servidor.</p>';
 }
 async function start(){
