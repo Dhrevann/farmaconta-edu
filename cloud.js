@@ -31,6 +31,7 @@ function goLocked(note) {
   document.body.classList.remove('app-ready');
   window.farmaCloudSave = undefined;
   currentUserId = null;
+  window.farmaSignedInUser = null;
   if(accountControls) accountControls.remove();
   accountControls = null;
   setAuth(note || 'Inicia sesión con tu cuenta autorizada.');
@@ -71,6 +72,8 @@ async function openWorkspace(user) {
   setAccountUi(user);
   setSync(workspace?'Todos tus datos están cargados desde la nube.':'Tu farmacia está lista; personalízala y guarda para crear tu espacio.');
   setAuth('Acceso correcto.');
+  window.farmaSignedInUser = user;
+  window.dispatchEvent(new Event('farma:ready'));
 }
 function queueSnapshot(snapshot) {
   if(!currentUserId) {setSync('No hay una sesión válida.','error'); return;}
@@ -122,6 +125,10 @@ window.addEventListener('beforeunload', (event) => {
   }
 });
 retryButton.addEventListener('click',()=>{if(pending&&!cloudBlocked)void flush();});
+// Reintentar escrituras pendientes al recuperar conexión/visibilidad.
+window.addEventListener('online',()=>{if(pending&&!cloudBlocked)void flush();});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&pending&&!cloudBlocked)void flush();});
+setInterval(()=>{if(pending&&!cloudBlocked&&!writing&&navigator.onLine)void flush();},15000);
 loginButton.addEventListener('click',async()=>{
   if(!client)return;
   loginButton.disabled=true;
@@ -143,6 +150,7 @@ if(!isConfigValid()) {
     throw e;
   }
   client=createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+  window.farmaSupabaseClient=client;
   async function bootstrap() {
     if(started)return;
     started=true;
