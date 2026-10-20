@@ -168,6 +168,34 @@ body.app-ready #sync-banner{display:flex;align-items:center;gap:8px}
 }
 @media print{#feedback-stack{display:none!important}}
 
+
+/* Ticket didáctico de impresora térmica: estilos también medibles fuera de impresión */
+.ticket-paper{background:#fff;color:#101827;width:58mm;box-sizing:border-box;padding:4mm;font-family:Arial,Helvetica,sans-serif;font-size:9pt;line-height:1.32}
+.ticket-paper.ticket-80{width:80mm;padding:5mm;font-size:10pt}
+.ticket-head{text-align:center;border-bottom:1px dashed #48566b;padding-bottom:8px;margin-bottom:8px}
+.ticket-head img{display:block;max-width:18mm;max-height:16mm;margin:0 auto 4px;object-fit:contain}
+.ticket-brand{font-weight:800;font-size:14pt;line-height:1.1;overflow-wrap:anywhere}
+.ticket-sub{font-size:7.6pt;color:#344054;overflow-wrap:anywhere;margin-top:3px}
+.ticket-chip{display:block;text-align:center;font-size:8pt;font-weight:700;border:1px solid #344054;border-radius:5px;margin:8px 0 7px;padding:5px 3px}
+.ticket-paper hr{border:0;border-top:1px dashed #7b8798;margin:7px 0}
+.ticket-line{display:flex;justify-content:space-between;gap:7px;margin:3px 0}
+.ticket-line span:first-child{min-width:0;overflow-wrap:anywhere}
+.ticket-line strong:last-child{white-space:nowrap}
+.ticket-product{padding:4px 0;border-bottom:1px dotted #c6ced8;break-inside:avoid}
+.ticket-product .ticket-description{font-weight:650;overflow-wrap:anywhere}
+.ticket-product .ticket-line{font-size:8pt;margin-top:1px}
+.ticket-paper.ticket-80 .ticket-product .ticket-line{font-size:9pt}
+.ticket-total{border-top:2px solid #111827;border-bottom:2px solid #111827;margin:9px 0;padding:7px 0;font-size:13pt;font-weight:800}
+.ticket-legal{text-align:center;font-size:8pt;font-weight:800;line-height:1.35;border:1px dashed #556070;border-radius:5px;padding:7px 3px;margin-top:11px;overflow-wrap:anywhere}
+.ticket-end{text-align:center;font-size:7pt;color:#4b5563;margin-top:8px}
+#ticket-page-style{display:none}
+@media print {
+  .print-root.ticket-mode{display:block!important;width:auto!important}
+  .print-root.ticket-mode .ticket-paper{margin:0;box-shadow:none;page-break-after:auto}
+  .print-root.ticket-mode .print-page{display:none!important}
+  .print-root.ticket-mode *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
 </style>
 </head>
 <body>
@@ -231,12 +259,32 @@ body.app-ready #sync-banner{display:flex;align-items:center;gap:8px}
         </div>
       </section>
       <section class="view" id="view-inventario">
-        <div class="heading"><div><h1>Inventario farmacéutico</h1><p>Catálogo predeterminado para todos los estudiantes. Cada venta descuenta automáticamente las existencias.</p></div><button class="btn outline" id="print-inventory">🖨️ Imprimir inventario / PDF</button></div>
+        <div class="heading"><div><h1>Inventario farmacéutico</h1><p>Agrega, edita o desactiva productos ficticios. Las ventas descuentan existencias automáticamente.</p></div><button class="btn outline" id="print-inventory">🖨️ Imprimir inventario / PDF</button></div>
         <div class="stats" id="inventory-stats"></div>
-        <article class="card"><div class="flex-between" style="margin-bottom:14px"><h2 style="margin:0">Productos de demostración</h2><div style="width:min(280px,50%)"><input id="inventory-search" placeholder="Buscar producto" aria-label="Buscar producto"></div></div><div class="table-wrap"><table><thead><tr><th>Código</th><th>Producto</th><th>Presentación</th><th class="num">Costo S/</th><th class="num">Venta S/</th><th class="num">Stock</th><th>Estado</th></tr></thead><tbody id="inventory-body"></tbody></table></div><p class="footer-note">Los precios y las existencias son inventados. Se emplea un modelo de inventario a costo unitario fijo para facilitar el aprendizaje.</p></article>
+        <article class="card" style="margin-bottom:16px">
+          <div class="flex-between"><div><h2 id="inventory-form-title">Agregar producto ficticio</h2><p class="tiny muted">Puedes ampliar tu catálogo hasta 150 productos. Los cambios se guardan en tu farmacia de Supabase.</p></div></div>
+          <form id="inventory-product-form">
+            <div class="formrow">
+              <div class="field"><label for="inv-code">Código</label><input id="inv-code" maxlength="20" placeholder="P025" required autocomplete="off"></div>
+              <div class="field"><label for="inv-name">Nombre del producto</label><input id="inv-name" maxlength="100" placeholder="Producto de demostración" required></div>
+            </div>
+            <div class="formrow">
+              <div class="field"><label for="inv-unit">Presentación</label><input id="inv-unit" maxlength="60" placeholder="Caja x 10 unidades" required></div>
+              <div class="field"><label for="inv-stock">Existencias actuales</label><input id="inv-stock" type="number" min="0" max="99999" step="1" value="0" required></div>
+            </div>
+            <div class="formrow">
+              <div class="field"><label for="inv-cost">Costo unitario (S/)</label><input id="inv-cost" type="number" min="0" max="1000000" step="0.01" value="0" required></div>
+              <div class="field"><label for="inv-price">Precio de venta (S/)</label><input id="inv-price" type="number" min="0" max="1000000" step="0.01" value="0" required></div>
+            </div>
+            <p class="tiny muted" id="inv-form-help">Los cambios de existencias se interpretan como ajustes del inventario inicial en esta simulación; no representan compras reales.</p>
+            <div class="actions"><button class="btn" id="inv-save" type="submit">Agregar producto</button><button class="btn outline" id="inv-cancel" type="button" hidden>Cancelar edición</button></div>
+          </form>
+        </article>
+
+        <article class="card"><div class="flex-between" style="margin-bottom:14px"><h2 style="margin:0">Catálogo de mi farmacia</h2><div style="width:min(280px,50%)"><input id="inventory-search" placeholder="Buscar producto" aria-label="Buscar producto"></div></div><div class="table-wrap"><table><thead><tr><th>Código</th><th>Producto</th><th>Presentación</th><th class="num">Costo S/</th><th class="num">Venta S/</th><th class="num">Stock</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="inventory-body"></tbody></table></div><p class="footer-note">Un producto vendido conserva su historial: se desactiva en lugar de borrarse. Los ajustes de stock actualizan el inventario inicial del ejercicio (modelo académico simplificado).</p></article>
       </section>
       <section class="view" id="view-ventas">
-        <div class="heading"><div><h1>Simulador de ventas</h1><p>Sesión 10 · Emite comprobantes simulados para clientes ficticios. No existe comunicación con SUNAT.</p></div></div>
+        <div class="heading"><div><h1>Simulador de ventas</h1><p>Sesión 10 · Emite comprobantes simulados para clientes ficticios. No existe comunicación con SUNAT.</p></div><div class="field" style="min-width:160px"><label for="ticket-width">Ancho de ticket</label><select id="ticket-width"><option value="58">58 mm · etiquetera</option><option value="80">80 mm · térmica</option></select></div></div>
         <div class="two-cols">
           <article class="card"><h2>1. Datos de la operación</h2><div class="formrow"><div class="field"><label for="sale-type">Tipo de documento</label><select id="sale-type"><option value="boleta">Boleta de venta simulada</option><option value="factura">Factura simulada</option><option value="nota">Nota de venta interna</option></select></div><div class="field"><label for="sale-pay">Medio de pago</label><select id="sale-pay"><option value="Efectivo">Efectivo</option><option value="Tarjeta (simulada)">Tarjeta (simulada)</option><option value="Transferencia (simulada)">Transferencia (simulada)</option></select></div></div><div class="formrow"><div class="field"><label for="customer-name">Nombre o razón social del cliente</label><input id="customer-name" maxlength="100" value="Consumidor ficticio"></div><div class="field"><label for="customer-id">DNI / RUC ficticio</label><input id="customer-id" maxlength="24" value="00000000"></div></div><div class="divider"></div><h2>2. Agrega productos</h2><div class="field"><label for="product-select">Producto</label><select id="product-select"></select></div><div class="formrow"><div class="field"><label for="product-qty">Cantidad</label><input type="number" id="product-qty" min="1" max="9999" step="1" value="1"></div><div class="field" style="display:flex;align-items:end"><button type="button" class="btn" id="add-cart" style="width:100%">+ Agregar a la venta</button></div></div><div class="divider"></div><h2>3. Detalle de la venta</h2><div class="table-wrap"><table><thead><tr><th>Producto</th><th class="num">Cant.</th><th class="num">Importe</th><th></th></tr></thead><tbody id="cart-body"><tr><td colspan="4" class="empty">Aún no agregas productos.</td></tr></tbody></table></div><div class="field" style="margin-top:16px"><label for="sale-discount">Descuento total (%)</label><input id="sale-discount" type="number" min="0" max="50" step="1" value="0"></div></article>
           <article class="card stack"><h2>Resumen del comprobante</h2><div class="note warning">Documento simulado, sin validez tributaria. El ejemplo supone precios con IGV incluido al 18 % y productos gravados, exclusivamente con fines académicos.</div><div class="breakdown" id="cart-totals"></div><button class="btn" id="complete-sale">Confirmar venta y generar documento</button><button class="btn outline" id="empty-cart">Vaciar carrito</button><div class="divider"></div><h3>Comprobantes emitidos</h3><div id="sales-history"></div></article>
@@ -263,7 +311,7 @@ body.app-ready #sync-banner{display:flex;align-items:center;gap:8px}
     </main>
   </div>
 </div>
-<div id="print-root" class="print-root"></div>
+<div id="print-root" class="print-root"></div><style id="ticket-page-style"></style>
 
 <script>
 'use strict';
@@ -301,10 +349,10 @@ const dec=n=>Math.round((Number(n)||0)*100)/100;
 const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dateLabel=iso=>{let d=new Date(iso);return isNaN(d.getTime())?'Fecha no disponible':d.toLocaleString('es-PE',{dateStyle:'short',timeStyle:'short'});};
 const sum=(list,key)=>dec(list.reduce((a,item)=>a+(typeof key==='function'?key(item):Number(item[key])||0),0));
-const defaultState=()=>({version:1,pharmacy:{name:'',legal:'',ruc:'00000000000',phone:'',address:'',student:'',logo:'',initialCash:3500},products:SEED.map(([id,name,unit,cost,price,stock])=>({id,name,unit,cost,price,stock,initialStock:stock})),sales:[],expenses:[],counters:{boleta:0,factura:0,nota:0},quizSolved:[false,false,false],analysis:''});
+const defaultState=()=>({version:1,pharmacy:{name:'',legal:'',ruc:'00000000000',phone:'',address:'',student:'',logo:'',initialCash:3500},products:SEED.map(([id,name,unit,cost,price,stock])=>({id,name,unit,cost,price,stock,initialStock:stock,active:true})),sales:[],expenses:[],counters:{boleta:0,factura:0,nota:0},quizSolved:[false,false,false],analysis:''});
 let state=loadState(),cart=[],active='inicio',logoDraft='';
 function loadState(){return defaultState();}
-function isValid(o){return o&&o.version===1&&o.pharmacy&&typeof o.pharmacy==='object'&&Array.isArray(o.products)&&o.products.length>0&&o.products.length<=150&&o.products.every(p=>typeof p.id==='string'&&typeof p.name==='string'&&Number.isFinite(p.cost)&&p.cost>=0&&Number.isFinite(p.price)&&p.price>=0&&Number.isInteger(p.stock)&&p.stock>=0&&Number.isInteger(p.initialStock)&&p.initialStock>=0)&&Array.isArray(o.sales)&&o.sales.length<=10000&&o.sales.every(s=>s&&Array.isArray(s.items)&&['boleta','factura','nota'].includes(s.type)&&Number.isFinite(s.total)&&Number.isFinite(s.net)&&Number.isFinite(s.tax)&&Number.isFinite(s.cost))&&Array.isArray(o.expenses)&&o.expenses.length<=10000&&o.expenses.every(x=>x&&Number.isFinite(x.amount))&&o.counters&&typeof o.analysis==='string'&&o.analysis.length<=20000&&Number.isFinite(o.pharmacy.initialCash)&&o.pharmacy.initialCash>=0&&o.pharmacy.initialCash<=1000000&&(!o.pharmacy.logo||String(o.pharmacy.logo).startsWith('data:image/png;base64,'));}
+function isValid(o){return o&&o.version===1&&o.pharmacy&&typeof o.pharmacy==='object'&&Array.isArray(o.products)&&o.products.length>0&&o.products.length<=150&&o.products.every(p=>typeof p.id==='string'&&typeof p.name==='string'&&Number.isFinite(p.cost)&&p.cost>=0&&Number.isFinite(p.price)&&p.price>=0&&Number.isInteger(p.stock)&&p.stock>=0&&Number.isInteger(p.initialStock)&&p.initialStock>=0&&(p.active===undefined||typeof p.active==='boolean'))&&Array.isArray(o.sales)&&o.sales.length<=10000&&o.sales.every(s=>s&&Array.isArray(s.items)&&['boleta','factura','nota'].includes(s.type)&&Number.isFinite(s.total)&&Number.isFinite(s.net)&&Number.isFinite(s.tax)&&Number.isFinite(s.cost))&&Array.isArray(o.expenses)&&o.expenses.length<=10000&&o.expenses.every(x=>x&&Number.isFinite(x.amount))&&o.counters&&typeof o.analysis==='string'&&o.analysis.length<=20000&&Number.isFinite(o.pharmacy.initialCash)&&o.pharmacy.initialCash>=0&&o.pharmacy.initialCash<=1000000&&(!o.pharmacy.logo||String(o.pharmacy.logo).startsWith('data:image/png;base64,'));}
 function save(){if(typeof window.farmaCloudSave!=='function'){toast('Espera a iniciar sesión para guardar.',true);return false;}window.farmaCloudSave(JSON.parse(JSON.stringify(state)));return true;}
 function toast(message,error=false){const el=document.querySelector('#toast');el.textContent=message;el.style.background=error?'#923840':'#103b30';el.classList.add('visible');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('visible'),4300);}
 function openingInventory(){return sum(state.products,p=>p.initialStock*p.cost)}
@@ -329,17 +377,17 @@ document.querySelector('#pharmacy-preview').innerHTML=`<div class="logo-zone">${
 document.querySelector('#opening-metrics').innerHTML=`<div class="breakdown"><div><span>Efectivo inicial</span><b>${money(p.initialCash)}</b></div><div><span>Inventario inicial al costo</span><b>${money(openingInventory())}</b></div><div><strong>Capital contable inicial</strong><b>${money(capital())}</b></div></div>`;
 let locked=state.sales.length+state.expenses.length>0;document.querySelector('#business-cash').disabled=locked;document.querySelector('#cash-lock-note').textContent=locked?'Efectivo inicial bloqueado: ya existen operaciones registradas.':'El efectivo inicial puede cambiarse antes de registrar operaciones.';}
 function fillPharmacyForm(){let p=state.pharmacy;for(let [id,key] of [['business-name','name'],['business-legal','legal'],['business-ruc','ruc'],['business-phone','phone'],['business-address','address'],['student-name','student'],['business-cash','initialCash']])document.getElementById(id).value=p[key];}
-function renderInventory(){let q=document.querySelector('#inventory-search').value.trim().toLowerCase();let products=state.products.filter(p=>(p.id+' '+p.name+' '+p.unit).toLowerCase().includes(q));document.querySelector('#inventory-stats').innerHTML=metric('Productos distintos',String(state.products.length),'Catálogo predefinido')+metric('Unidades disponibles',String(state.products.reduce((a,p)=>a+p.stock,0)),'Total de productos físicos')+metric('Valor del inventario',money(stockValue()),'A precio de adquisición')+metric('Con stock bajo',String(state.products.filter(p=>p.stock<=5).length),'Cinco unidades o menos');
-document.querySelector('#inventory-body').innerHTML=products.map(p=>`<tr><td>${esc(p.id)}</td><td><strong>${esc(p.name)}</strong></td><td>${esc(p.unit)}</td><td class="num">${money(p.cost)}</td><td class="num">${money(p.price)}</td><td class="num">${p.stock}</td><td><span class="tag ${p.stock<=5?'low':''}">${p.stock===0?'Agotado':p.stock<=5?'Bajo':'Disponible'}</span></td></tr>`).join('')||'<tr><td colspan="7" class="empty">No se encontraron productos.</td></tr>';}
+function renderInventory(){let q=document.querySelector('#inventory-search').value.trim().toLowerCase();let products=state.products.filter(p=>(p.id+' '+p.name+' '+p.unit).toLowerCase().includes(q));document.querySelector('#inventory-stats').innerHTML=metric('Productos activos',String(state.products.filter(p=>p.active!==false).length),'Catálogo personalizado')+metric('Unidades disponibles',String(state.products.reduce((a,p)=>a+p.stock,0)),'Incluye productos inactivos')+metric('Valor del inventario',money(stockValue()),'A precio de adquisición')+metric('Con stock bajo',String(state.products.filter(p=>p.active!==false&&p.stock<=5).length),'Activos con cinco unidades o menos');
+document.querySelector('#inventory-body').innerHTML=products.map(p=>`<tr><td>${esc(p.id)}</td><td><strong>${esc(p.name)}</strong></td><td>${esc(p.unit)}</td><td class="num">${money(p.cost)}</td><td class="num">${money(p.price)}</td><td class="num">${p.stock}</td><td><span class="tag ${p.active===false?'low':p.stock<=5?'low':''}">${p.active===false?'Inactivo':p.stock===0?'Agotado':p.stock<=5?'Bajo':'Disponible'}</span></td><td><div class="actions"><button type="button" class="btn mini outline" data-inv-edit="${esc(p.id)}">Editar</button><button type="button" class="btn mini ${p.active===false?'outline':'danger'}" data-inv-toggle="${esc(p.id)}">${p.active===false?'Reactivar':productSalesQty(p.id)>0?'Desactivar':'Eliminar'}</button></div></td></tr>`).join('')||'<tr><td colspan="8" class="empty">No se encontraron productos.</td></tr>';}
 function saleName(t){return ({boleta:'BOLETA DE VENTA SIMULADA',factura:'FACTURA SIMULADA',nota:'NOTA DE VENTA INTERNA'})[t]||'DOCUMENTO SIMULADO'}
 function saleCode(s){return ({boleta:'B001',factura:'F001',nota:'N001'})[s.type]+'-'+String(s.number).padStart(6,'0')}
-function renderPOS(){let select=document.querySelector('#product-select'),old=select.value;select.innerHTML=state.products.filter(p=>p.stock>0).map(p=>`<option value="${esc(p.id)}">${esc(p.name)} · ${money(p.price)} · Stock ${p.stock}</option>`).join('')||'<option value="">Sin stock disponible</option>';if(state.products.some(p=>p.id===old&&p.stock>0))select.value=old;
+function renderPOS(){let select=document.querySelector('#product-select'),old=select.value;select.innerHTML=state.products.filter(p=>p.stock>0&&p.active!==false).map(p=>`<option value="${esc(p.id)}">${esc(p.name)} · ${money(p.price)} · Stock ${p.stock}</option>`).join('')||'<option value="">Sin stock disponible</option>';if(state.products.some(p=>p.id===old&&p.stock>0&&p.active!==false))select.value=old;
 document.querySelector('#cart-body').innerHTML=cart.map((c,i)=>`<tr><td>${esc(c.name)}</td><td class="num">${c.qty}</td><td class="num">${money(c.qty*c.price)}</td><td><button class="btn mini danger" data-remove-cart="${i}" aria-label="Quitar producto">×</button></td></tr>`).join('')||'<tr><td colspan="4" class="empty">Agrega uno o más productos.</td></tr>';
 let t=cartTotals();document.querySelector('#cart-totals').innerHTML=`<div><span>Subtotal antes de descuento</span><b>${money(t.subtotal)}</b></div><div><span>Descuento (${t.percent} %)</span><b>− ${money(t.discount)}</b></div><div><span>Valor de venta (sin IGV)</span><b>${money(t.net)}</b></div><div><span>IGV incluido (18 %)</span><b>${money(t.tax)}</b></div><div class="total" style="border-top:1px solid #ddd;padding-top:13px;margin-top:7px"><span>Importe total</span><b>${money(t.total)}</b></div>`;
-document.querySelector('#sales-history').innerHTML=state.sales.length?`<div class="table-wrap"><table><thead><tr><th>Documento</th><th class="num">Total</th><th></th></tr></thead><tbody>${[...state.sales].reverse().slice(0,30).map(s=>`<tr><td>${esc(saleCode(s))}<br><small>${esc(dateLabel(s.date))}</small></td><td class="num">${money(s.total)}</td><td><button class="btn mini outline" data-reprint="${esc(s.id)}">PDF</button></td></tr>`).join('')}</tbody></table></div>`:'<p class="muted tiny">Todavía no se emitieron comprobantes.</p>';}
+document.querySelector('#sales-history').innerHTML=state.sales.length?`<div class="table-wrap"><table><thead><tr><th>Documento</th><th class="num">Total</th><th></th></tr></thead><tbody>${[...state.sales].reverse().slice(0,30).map(s=>`<tr><td>${esc(saleCode(s))}<br><small>${esc(dateLabel(s.date))}</small></td><td class="num">${money(s.total)}</td><td><div class="actions"><button type="button" class="btn mini outline" data-reprint="${esc(s.id)}" title="Comprobante completo A4">A4/PDF</button><button type="button" class="btn mini outline" data-ticket="${esc(s.id)}" title="Ticket para impresora térmica">Ticket/PDF</button></div></td></tr>`).join('')}</tbody></table></div>`:'<p class="muted tiny">Todavía no se emitieron comprobantes.</p>';}
 function cartTotals(){let subtotal=sum(cart,c=>c.price*c.qty),percent=Math.min(50,Math.max(0,Number(document.querySelector('#sale-discount').value)||0)),discount=dec(subtotal*percent/100),total=dec(subtotal-discount),net=dec(total/(1+TAX)),tax=dec(total-net),cost=sum(cart,c=>c.cost*c.qty);return {subtotal,percent,discount,total,net,tax,cost};}
-function addToCart(){const p=state.products.find(x=>x.id===document.querySelector('#product-select').value),qty=Number(document.querySelector('#product-qty').value);if(!p){toast('No hay productos disponibles.',true);return}if(!Number.isInteger(qty)||qty<1){toast('Ingresa una cantidad entera y positiva.',true);return}let already=cart.find(x=>x.id===p.id),used=already?already.qty:0;if(used+qty>p.stock){toast('No hay suficiente stock para esta cantidad.',true);return}if(already)already.qty+=qty;else cart.push({id:p.id,name:p.name,unit:p.unit,qty,price:p.price,cost:p.cost});document.querySelector('#product-qty').value='1';renderPOS();}
-function completeSale(){if(!state.pharmacy.name.trim()){toast('Primero guarda el nombre de tu farmacia.',true);navigate('farmacia');return}if(cart.length===0){toast('Agrega productos para registrar la venta.',true);return}for(let c of cart){let p=state.products.find(p=>p.id===c.id);if(!p||p.stock<c.qty){toast('Una cantidad supera el stock disponible.',true);return}}
+function addToCart(){const p=state.products.find(x=>x.id===document.querySelector('#product-select').value),qty=Number(document.querySelector('#product-qty').value);if(!p||p.active===false){toast('No hay productos activos disponibles.',true);return}if(!Number.isInteger(qty)||qty<1){toast('Ingresa una cantidad entera y positiva.',true);return}let already=cart.find(x=>x.id===p.id),used=already?already.qty:0;if(used+qty>p.stock){toast('No hay suficiente stock para esta cantidad.',true);return}if(already)already.qty+=qty;else cart.push({id:p.id,name:p.name,unit:p.unit,qty,price:p.price,cost:p.cost});document.querySelector('#product-qty').value='1';renderPOS();}
+function completeSale(){if(!state.pharmacy.name.trim()){toast('Primero guarda el nombre de tu farmacia.',true);navigate('farmacia');return}if(cart.length===0){toast('Agrega productos para registrar la venta.',true);return}for(let c of cart){let p=state.products.find(p=>p.id===c.id);if(!p||p.active===false||p.stock<c.qty){toast('Un producto está inactivo o no tiene suficiente stock.',true);return}}
 let type=document.querySelector('#sale-type').value,customer=document.querySelector('#customer-name').value.trim(),doc=document.querySelector('#customer-id').value.trim();if(!customer){toast('Escribe un nombre ficticio de cliente.',true);return}if(type==='factura'&&!/^\d{11}$/.test(doc)){toast('Para practicar una factura, escribe un RUC ficticio de 11 dígitos (ej.: 00000000000).',true);return}if(type==='boleta'&&doc&&!/^\d{8}$/.test(doc)){toast('Para practicar una boleta usa un DNI ficticio de 8 dígitos, o deja el campo vacío.',true);return}
 let t=cartTotals();if(t.total<=0){toast('El total de la operación debe ser mayor que cero.',true);return}let payment=document.querySelector('#sale-pay').value,number=Number(state.counters[type]||0)+1;let sale={id:'S'+Date.now()+Math.random().toString(36).slice(2,8),type,number,date:new Date().toISOString(),customer,customerDoc:doc,payment,items:cart.map(c=>({...c})),...t};for(let c of cart)state.products.find(x=>x.id===c.id).stock-=c.qty;state.sales.push(sale);state.counters[type]=number;if(!save()){state.sales.pop();state.counters[type]=number-1;for(let c of cart)state.products.find(x=>x.id===c.id).stock+=c.qty;return}cart=[];document.querySelector('#sale-discount').value='0';render();toast('Venta '+saleCode(sale)+' registrada. Se actualizó el inventario.');printReceipt(sale);}
 function renderExpenses(){let fixed=sum(state.expenses.filter(e=>e.kind==='Fijo'),'amount'),variable=sum(state.expenses.filter(e=>e.kind==='Variable'),'amount');document.querySelector('#expense-totals').innerHTML=`<div><span>Gastos fijos</span><b>${money(fixed)}</b></div><div><span>Gastos variables</span><b>${money(variable)}</b></div><div class="total"><span>Total</span><b>${money(totalExpenses())}</b></div><div><span>Efectivo disponible</span><b>${money(cashBalance())}</b></div>`;document.querySelector('#expense-history').innerHTML=state.expenses.length?`<div class="table-wrap"><table><thead><tr><th>Concepto</th><th>Tipo</th><th class="num">Importe</th></tr></thead><tbody>${[...state.expenses].reverse().map(e=>`<tr><td>${esc(e.concept)}<br><small>${esc(dateLabel(e.date))}</small></td><td>${esc(e.kind)}</td><td class="num">${money(e.amount)}</td></tr>`).join('')}</tbody></table></div>`:'<p class="muted">Registra tus primeros gastos para comenzar el análisis.</p>';}
@@ -354,7 +402,7 @@ function renderReports(){let m=metrics(),margin=m.net?100*(m.net-m.cost)/m.net:0
 let fixed=sum(state.expenses.filter(e=>e.kind==='Fijo'),'amount'),contribution=m.net>0?dec((m.net-m.cost)/m.net):0;document.querySelector('#financial-summary').innerHTML=`<div class="breakdown"><div><span>Ventas totales con IGV</span><b>${money(m.sales)}</b></div><div><span>IGV trasladado (simulado)</span><b>${money(m.tax)}</b></div><div><span>Ingresos netos (sin IGV)</span><b>${money(m.net)}</b></div><div><span>(−) Costo de ventas</span><b>${money(m.cost)}</b></div><div><span>Margen bruto</span><b>${money(m.net-m.cost)}</b></div><div><span>(−) Gastos operativos</span><b>${money(m.expenses)}</b></div><div class="total"><span>Resultado operativo</span><b class="${m.profit>=0?'positive':'negative'}">${money(m.profit)}</b></div><div><span>Margen bruto relativo</span><b>${margin.toFixed(1)} %</b></div><div><span>Gastos fijos registrados</span><b>${money(fixed)}</b></div>${contribution>0?`<div><span>Equilibrio aproximado (ventas netas)</span><b>${money(fixed/contribution)}</b></div>`:''}</div><p class="tiny muted" style="margin-top:13px">El punto de equilibrio es una estimación ilustrativa, basada en el margen bruto observado y los gastos clasificados como fijos; no reemplaza un análisis real de costos variables.</p>`;}
 function headerPrint(){let p=state.pharmacy;return `<div class="print-head">${p.logo?`<img alt="Logotipo" src="${esc(p.logo)}">`:''}<div><strong>${esc(p.name||'FARMACIA SIN NOMBRE')}</strong><br><small>${esc(p.legal||'Establecimiento ficticio')} · RUC FICTICIO: ${esc(p.ruc||'NO REGISTRADO')}</small><br><small>${esc(p.address||'Dirección no registrada')} · ${esc(p.phone||'')}</small></div></div>`}
 function bannerPrint(){return `<div class="print-watermark">SIMULACIÓN ACADÉMICA · SIN VALIDEZ TRIBUTARIA · NO EMITIDO POR SUNAT</div>`}
-function printHTML(body){const el=document.querySelector('#print-root');el.innerHTML=`<div class="print-page">${body}<div class="print-footer">FarmaConta EDU · III Unidad · Documentos Contables en una Oficina Farmacéutica<br>Ejercicio ficticio sin efecto legal, comercial ni tributario.</div></div>`;window.print();}
+function printHTML(body){document.querySelector('#ticket-page-style').textContent='';const el=document.querySelector('#print-root');el.className='print-root';el.innerHTML=`<div class="print-page">${body}<div class="print-footer">FarmaConta EDU · III Unidad · Documentos Contables en una Oficina Farmacéutica<br>Ejercicio ficticio sin efecto legal, comercial ni tributario.</div></div>`;window.print();}
 function printReceipt(s){const rows=s.items.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.unit)}</td><td style="text-align:right">${c.qty}</td><td style="text-align:right">${money(c.price)}</td><td style="text-align:right">${money(c.qty*c.price)}</td></tr>`).join('');printHTML(`${headerPrint()}<h2 class="print-title">${esc(saleName(s.type))}</h2><strong>N.° ${esc(saleCode(s))}</strong><p>Fecha: ${esc(dateLabel(s.date))}<br>Cliente ficticio: ${esc(s.customer)}<br>Identificación ficticia: ${esc(s.customerDoc||'Sin identificar')}<br>Pago simulado: ${esc(s.payment)}</p>${bannerPrint()}<table class="print-table"><thead><tr><th>Descripción</th><th>Presentación</th><th>Cant.</th><th>P. unit.</th><th>Importe</th></tr></thead><tbody>${rows}</tbody></table><div class="print-summary"><p><span>Subtotal</span><strong>${money(s.subtotal)}</strong></p><p><span>Descuento (${esc(s.percent)} %)</span><strong>− ${money(s.discount)}</strong></p><p><span>Valor de venta (sin IGV)</span><strong>${money(s.net)}</strong></p><p><span>IGV didáctico (18 %)</span><strong>${money(s.tax)}</strong></p><p style="font-size:15pt"><b>TOTAL</b><b>${money(s.total)}</b></p></div><p class="tiny">Todas las operaciones son ficticias. Se supone IGV 18 % incluido en todos los productos, sin excepciones, exclusivamente con fines formativos.</p>`);}
 function financialPrint(){let m=metrics(),margin=m.net?((m.net-m.cost)/m.net*100):0;return `${headerPrint()}<h2 class="print-title">Sesión 09 / 12 · Reporte de educación financiera</h2>${bannerPrint()}<p>Estudiante: ${esc(state.pharmacy.student||'No registrado')}<br>Fecha del reporte: ${esc(dateLabel(new Date().toISOString()))}</p><table class="print-table"><thead><tr><th>Indicador</th><th>Resultado</th></tr></thead><tbody>${[['Efectivo inicial',m.capital-openingInventory()],['Inventario inicial valorizado',openingInventory()],['Capital inicial',m.capital],['Ventas totales con IGV',m.sales],['Ingresos netos de ventas',m.net],['Costo de ventas',m.cost],['Gastos operativos',m.expenses],['Resultado operativo',m.profit],['Efectivo final',m.cash],['Inventario final',m.stock]].map(([a,b])=>`<tr><td>${esc(a)}</td><td>${money(b)}</td></tr>`).join('')}</tbody></table><p>Margen bruto relativo: <b>${margin.toFixed(2)} %</b>. Se presenta un modelo contable simplificado, sin impuestos sobre la renta.</p><h3>Detalle de gastos</h3>${state.expenses.length?`<table class="print-table"><thead><tr><th>Fecha</th><th>Concepto</th><th>Tipo</th><th>Importe</th></tr></thead><tbody>${state.expenses.map(e=>`<tr><td>${esc(dateLabel(e.date))}</td><td>${esc(e.concept)}</td><td>${esc(e.kind)}</td><td>${money(e.amount)}</td></tr>`).join('')}</tbody></table>`:'<p>Aún no se han registrado gastos.</p>'}`;}
 function booksPrint(){let entries=journal(),m=metrics();return `${headerPrint()}<h2 class="print-title">Sesión 11 · Libro diario didáctico</h2>${bannerPrint()}<table class="print-table"><thead><tr><th>Asiento</th><th>Fecha</th><th>Cuenta</th><th>Glosa</th><th>Debe</th><th>Haber</th></tr></thead><tbody>${entries.flatMap(e=>e.lines.map(l=>`<tr><td>${e.number}</td><td>${esc(e.date)}</td><td>${esc(ACCOUNTS[l.account])}</td><td>${esc(e.glosa)}</td><td>${money(l.debit)}</td><td>${money(l.credit)}</td></tr>`)).join('')}</tbody></table><h2 class="print-title">Libro mayor didáctico</h2><table class="print-table"><thead><tr><th>Cuenta</th><th>Debe</th><th>Haber</th><th>Saldo</th></tr></thead><tbody>${ledger().map(l=>`<tr><td>${esc(ACCOUNTS[l.account])}</td><td>${money(l.debit)}</td><td>${money(l.credit)}</td><td>${money(Math.abs(l.debit-l.credit))} ${l.debit>=l.credit?'D':'H'}</td></tr>`).join('')}</tbody></table><h2 class="print-title">Estado de situación financiera simplificado</h2><table class="print-table"><tbody><tr><td>Caja y bancos</td><td>${money(m.cash)}</td></tr><tr><td>Mercaderías</td><td>${money(m.stock)}</td></tr><tr><th>Total activo</th><th>${money(m.cash+m.stock)}</th></tr><tr><td>IGV por pagar (simulado)</td><td>${money(m.tax)}</td></tr><tr><td>Capital inicial</td><td>${money(m.capital)}</td></tr><tr><td>Resultado acumulado</td><td>${money(m.profit)}</td></tr><tr><th>Total pasivo y patrimonio</th><th>${money(m.tax+m.capital+m.profit)}</th></tr></tbody></table><p class="tiny">Las denominaciones de cuentas están agrupadas para el ejercicio. No constituyen una codificación ni aplicación completa del PCGE.</p>`;}
@@ -363,9 +411,136 @@ function printReport(which){let body=which==='finanzas'?financialPrint():which==
 function backup(){const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),a=document.createElement('a'),u=URL.createObjectURL(blob);a.href=u;a.download='FarmaConta_respaldo_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000);toast('Respaldo descargado. Guárdalo para recuperar tu trabajo.');}
 function restore(file){if(!file)return;if(file.size>5*1024*1024){toast('El respaldo es demasiado grande.',true);return}const reader=new FileReader();reader.onload=()=>{try{let data=JSON.parse(reader.result);if(!isValid(data))throw Error('Formato incorrecto');if(!confirm('¿Reemplazar todos los datos actuales con este respaldo?'))return;let previous=state;state=data;cart=[];if(!save()){state=previous;return}logoDraft='';fillPharmacyForm();document.querySelector('#student-analysis').value=state.analysis;render();navigate('inicio');toast('Respaldo restaurado correctamente.')}catch(e){toast('No se pudo importar: archivo incorrecto o incompatible.',true)}};reader.readAsText(file);}
 async function loadLogo(file){if(!file)return;if(file.type!=='image/png'){toast('Solo se aceptan imágenes PNG.',true);return}if(file.size>2*1024*1024){toast('El PNG debe pesar 2 MB o menos.',true);return}let reader=new FileReader();reader.onload=()=>{let img=new Image();img.onload=()=>{let size=240,ratio=Math.min(1,size/Math.max(img.width,img.height)),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.width*ratio));canvas.height=Math.max(1,Math.round(img.height*ratio));canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);logoDraft=canvas.toDataURL('image/png');let holder=document.querySelector('#logo-holder');holder.innerHTML=`<img class="logo-preview" alt="Nuevo logotipo" src="${esc(logoDraft)}">`;toast('Logotipo preparado. Pulsa «Guardar mi farmacia» para conservarlo.');};img.onerror=()=>toast('No se pudo leer el archivo de imagen.',true);img.src=reader.result};reader.readAsDataURL(file);}
-function attach(){document.querySelectorAll('.nav-btn').forEach(x=>x.addEventListener('click',()=>navigate(x.dataset.view)));document.addEventListener('click',e=>{let nav=e.target.closest('[data-view]');if(nav&&!nav.classList.contains('nav-btn'))navigate(nav.dataset.view);let del=e.target.closest('[data-remove-cart]');if(del){cart.splice(Number(del.dataset.removeCart),1);renderPOS()}let rep=e.target.closest('[data-reprint]');if(rep){let s=state.sales.find(x=>x.id===rep.dataset.reprint);if(s)printReceipt(s)}let print=e.target.closest('[data-print]');if(print)printReport(print.dataset.print)});
+function productSalesQty(id){
+  return state.sales.reduce((total,s)=>total+s.items.reduce((n,item)=>n+(item.id===id?Number(item.qty)||0:0),0),0);
+}
+
+function resetInventoryProductForm(){
+  const form=document.querySelector('#inventory-product-form');
+  form.dataset.editing='';
+  form.reset();
+  document.querySelector('#inv-code').readOnly=false;
+  document.querySelector('#inv-cost').readOnly=false;
+  document.querySelector('#inv-save').textContent='Agregar producto';
+  document.querySelector('#inventory-form-title').textContent='Agregar producto ficticio';
+  document.querySelector('#inv-cancel').hidden=true;
+  document.querySelector('#inv-form-help').textContent='Las existencias se contabilizan como inventario inicial ficticio, no como una compra.';
+}
+
+function editInventoryProduct(id){
+  const p=state.products.find(x=>x.id===id);if(!p)return;
+  const sold=productSalesQty(id);
+  const form=document.querySelector('#inventory-product-form');
+  form.dataset.editing=id;
+  const vals={'inv-code':p.id,'inv-name':p.name,'inv-unit':p.unit,'inv-cost':p.cost,'inv-price':p.price,'inv-stock':p.stock};
+  for(const [field,value] of Object.entries(vals))document.getElementById(field).value=String(value);
+  document.querySelector('#inv-code').readOnly=true;
+  document.querySelector('#inv-cost').readOnly=sold>0;
+  document.querySelector('#inv-save').textContent='Guardar cambios';
+  document.querySelector('#inventory-form-title').textContent='Editar · '+p.id;
+  document.querySelector('#inv-cancel').hidden=false;
+  document.querySelector('#inv-form-help').textContent=sold>0
+    ?'Producto con ventas: se conserva el costo histórico y los comprobantes anteriores. Al ajustar existencias se recalcula el inventario inicial ficticio.'
+    :'Puedes modificar costo y existencias. Se recalculará el inventario inicial ficticio del ejercicio.';
+  form.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function saveInventoryProduct(event){
+  event.preventDefault();
+  const form=event.currentTarget;
+  const editing=form.dataset.editing||'';
+  const id=document.querySelector('#inv-code').value.trim().toUpperCase();
+  const name=document.querySelector('#inv-name').value.trim();
+  const unit=document.querySelector('#inv-unit').value.trim();
+  const cost=Number(document.querySelector('#inv-cost').value);
+  const price=Number(document.querySelector('#inv-price').value);
+  const stock=Number(document.querySelector('#inv-stock').value);
+  if(!/^[A-Z0-9_-]{2,20}$/.test(id)){toast('Usa un código de 2 a 20 caracteres: letras, números, guion o guion bajo.',true);return}
+  if(!name||name.length>100||!unit||unit.length>60){toast('Indica el nombre y presentación del producto.',true);return}
+  if(!Number.isFinite(cost)||cost<0||cost>1000000||!Number.isFinite(price)||price<0||price>1000000){toast('Costo o precio fuera del rango permitido.',true);return}
+  if(!Number.isSafeInteger(stock)||stock<0||stock>99999){toast('Las existencias deben ser un entero entre 0 y 99999.',true);return}
+  const previous=state.products.map(p=>({...p}));
+  if(editing){
+    const p=state.products.find(p=>p.id===editing);
+    if(!p){toast('No se encontró el producto para editar.',true);return}
+    const sold=productSalesQty(editing);
+    if(sold>0&&dec(cost)!==p.cost){toast('El costo de un producto vendido no puede modificarse para proteger los balances.',true);return}
+    const initialStock=stock+sold;
+    if(!Number.isSafeInteger(initialStock)||initialStock>999999){toast('Cantidad acumulada demasiado alta.',true);return}
+    Object.assign(p,{name,unit,cost:dec(cost),price:dec(price),stock,initialStock});
+  }else{
+    if(state.products.length>=150){toast('El catálogo permite como máximo 150 productos.',true);return}
+    if(state.products.some(p=>p.id.toUpperCase()===id)){toast('Ese código ya está registrado.',true);return}
+    state.products.push({id,name,unit,cost:dec(cost),price:dec(price),stock,initialStock:stock,active:true});
+  }
+  if(!isValid(state)){state.products=previous;toast('No se pudo validar el inventario.',true);return}
+  if(!save()){state.products=previous;return}
+  if(editing)cart=cart.filter(c=>c.id!==editing);
+  resetInventoryProductForm();
+  render();
+  toast(editing?'Producto actualizado; revisa el guardado en la nube.':'Producto agregado; revisa el guardado en la nube.');
+}
+
+function toggleInventoryProduct(id){
+  const p=state.products.find(x=>x.id===id);if(!p)return;
+  const sold=productSalesQty(id);
+  const wasActive=p.active!==false;
+  if(!wasActive){
+    p.active=true;
+  }else if(sold>0){
+    if(!confirm('Este producto ya aparece en ventas. Se desactivará para nuevas ventas sin borrarlo del historial. ¿Continuar?'))return;
+    p.active=false;
+  }else{
+    if(state.products.length===1){toast('El catálogo debe conservar al menos un producto.',true);return}
+    if(!confirm('Eliminar definitivamente «'+p.name+'» del catálogo ficticio?'))return;
+    const before=state.products;
+    state.products=before.filter(x=>x.id!==id);
+    if(!save()){state.products=before;return}
+    cart=cart.filter(c=>c.id!==id);
+    if(document.querySelector('#inventory-product-form').dataset.editing===id)resetInventoryProductForm();
+    render();
+    toast('Producto eliminado; espera la confirmación de guardado.');
+    return;
+  }
+  if(!save()){p.active=wasActive;return}
+  if(wasActive)cart=cart.filter(c=>c.id!==id);
+  render();
+  toast(wasActive?'Producto desactivado sin borrar ventas anteriores.':'Producto reactivado.');
+}
+
+function printThermalTicket(s){
+  const width=Number(document.querySelector('#ticket-width')?.value)===80?80:58;
+  const p=state.pharmacy;
+  const logo=p.logo?`<img alt="Logotipo" src="${esc(p.logo)}">`:'';
+  const items=s.items.map(item=>`<div class="ticket-product"><div class="ticket-description">${esc(item.name)}</div><div class="ticket-line"><span>${esc(item.qty)} × ${money(item.price)} · ${esc(item.unit||'')}</span><strong>${money(item.qty*item.price)}</strong></div></div>`).join('');
+  const content=`<div class="ticket-paper ${width===80?'ticket-80':''}">
+    <div class="ticket-head">${logo}<div class="ticket-brand">${esc(p.name||'BOTICA DEMOSTRACIÓN')}</div><div class="ticket-sub">${esc(p.legal||'Establecimiento ficticio')}<br>RUC ficticio: ${esc(p.ruc||'00000000000')}<br>${esc(p.address||'Dirección ficticia')}</div></div>
+    <div class="ticket-chip">${esc(saleName(s.type))}<br>${esc(saleCode(s))}</div>
+    <div class="ticket-sub">Fecha: ${esc(dateLabel(s.date))}<br>Cliente: ${esc(s.customer)}<br>Doc.: ${esc(s.customerDoc||'—')}<br>Pago: ${esc(s.payment)}</div>
+    <hr><div class="ticket-sub" style="font-weight:800">DESCRIPCIÓN / IMPORTE</div>${items}<hr>
+    <div class="ticket-line"><span>Subtotal</span><strong>${money(s.subtotal)}</strong></div>
+    <div class="ticket-line"><span>Descuento</span><strong>− ${money(s.discount)}</strong></div>
+    <div class="ticket-line"><span>IGV didáctico incluido</span><strong>${money(s.tax)}</strong></div>
+    <div class="ticket-line ticket-total"><span>TOTAL</span><strong>${money(s.total)}</strong></div>
+    <div class="ticket-legal">SIMULACIÓN ACADÉMICA<br>SIN VALIDEZ TRIBUTARIA<br>NO EMITIDO POR SUNAT</div>
+    <div class="ticket-end">FarmaConta EDU · III Unidad<br>Gracias por participar en la práctica.</div>
+  </div>`;
+  const root=document.querySelector('#print-root');
+  root.className='print-root ticket-mode';
+  root.innerHTML=content;
+  // Measure with screen-equivalent thermal styling so height adapts to many lines.
+  root.style.cssText='display:block;position:fixed;left:-12000px;top:0;visibility:hidden;z-index:-1;';
+  const paper=root.querySelector('.ticket-paper');
+  const heightPixels=paper.getBoundingClientRect().height;
+  root.removeAttribute('style');
+  const heightMm=Math.min(1000,Math.max(85,Math.ceil(heightPixels*25.4/96+12)));
+  document.querySelector('#ticket-page-style').textContent=`@media print { @page { size: ${width}mm ${heightMm}mm; margin: 0; } }`;
+  window.print();
+}
+
+function attach(){document.querySelectorAll('.nav-btn').forEach(x=>x.addEventListener('click',()=>navigate(x.dataset.view)));document.addEventListener('click',e=>{let nav=e.target.closest('[data-view]');if(nav&&!nav.classList.contains('nav-btn'))navigate(nav.dataset.view);let del=e.target.closest('[data-remove-cart]');if(del){cart.splice(Number(del.dataset.removeCart),1);renderPOS()}let rep=e.target.closest('[data-reprint]');if(rep){let s=state.sales.find(x=>x.id===rep.dataset.reprint);if(s)printReceipt(s)}let ticket=e.target.closest('[data-ticket]');if(ticket){let s=state.sales.find(x=>x.id===ticket.dataset.ticket);if(s)printThermalTicket(s)}let edit=e.target.closest('[data-inv-edit]');if(edit)editInventoryProduct(edit.dataset.invEdit);let toggle=e.target.closest('[data-inv-toggle]');if(toggle)toggleInventoryProduct(toggle.dataset.invToggle);let print=e.target.closest('[data-print]');if(print)printReport(print.dataset.print)});
 document.querySelector('#pharmacy-form').addEventListener('submit',e=>{e.preventDefault();let form={name:document.querySelector('#business-name').value.trim(),legal:document.querySelector('#business-legal').value.trim(),ruc:document.querySelector('#business-ruc').value.trim(),phone:document.querySelector('#business-phone').value.trim(),address:document.querySelector('#business-address').value.trim(),student:document.querySelector('#student-name').value.trim(),logo:logoDraft||state.pharmacy.logo,initialCash:state.pharmacy.initialCash};if(!form.name){toast('Ingresa el nombre de la farmacia.',true);return}if(!/^\d{11}$/.test(form.ruc)){toast('Usa un RUC ficticio de 11 dígitos (por ejemplo 00000000000).',true);return}if(state.sales.length+state.expenses.length===0){let cash=Number(document.querySelector('#business-cash').value);if(!Number.isFinite(cash)||cash<0||cash>1000000){toast('Efectivo inicial incorrecto.',true);return}form.initialCash=dec(cash)}let old=state.pharmacy;state.pharmacy=form;if(!save()){state.pharmacy=old;return}logoDraft='';render();toast('Datos de la farmacia guardados correctamente.');});
-document.querySelector('#logo-input').addEventListener('change',e=>loadLogo(e.target.files[0]));document.querySelector('#inventory-search').addEventListener('input',renderInventory);
+document.querySelector('#logo-input').addEventListener('change',e=>loadLogo(e.target.files[0]));document.querySelector('#inventory-search').addEventListener('input',renderInventory);document.querySelector('#inventory-product-form').addEventListener('submit',saveInventoryProduct);document.querySelector('#inv-cancel').addEventListener('click',resetInventoryProductForm);
 document.querySelector('#sale-type').addEventListener('change',e=>{if(e.target.value==='factura'){document.querySelector('#customer-name').value='Empresa DEMO S.A.C.';document.querySelector('#customer-id').value='00000000000'}else{document.querySelector('#customer-name').value='Consumidor ficticio';document.querySelector('#customer-id').value='00000000'}});document.querySelector('#sale-discount').addEventListener('input',renderCartTotalsOnly);document.querySelector('#add-cart').addEventListener('click',addToCart);document.querySelector('#empty-cart').addEventListener('click',()=>{cart=[];renderPOS()});document.querySelector('#complete-sale').addEventListener('click',completeSale);
 document.querySelector('#expense-form').addEventListener('submit',addExpense);document.querySelector('#print-inventory').addEventListener('click',()=>printReport('inventario'));document.querySelector('#print-books').addEventListener('click',()=>printReport('libros'));
 document.querySelector('#quiz-case').addEventListener('change',()=>{document.querySelector('#quiz-debit').value='';document.querySelector('#quiz-credit').value='';document.querySelector('#quiz-result').innerHTML=''});document.querySelector('#check-quiz').addEventListener('click',()=>{let answers=[['expense','cash'],['cogs','stock'],['cash','capital']],correct=answers[Number(document.querySelector('#quiz-case').value)],d=document.querySelector('#quiz-debit').value,c=document.querySelector('#quiz-credit').value;let right=d===correct[0]&&c===correct[1];document.querySelector('#quiz-result').innerHTML=right?'<p class="quiz-result positive">✓ ¡Correcto! Se respeta la partida doble.</p>':`<p class="quiz-result negative">Aún no. Revisa: Debe «${esc(ACCOUNTS[correct[0]])}» y Haber «${esc(ACCOUNTS[correct[1]])}».</p>`;if(right){if(!Array.isArray(state.quizSolved))state.quizSolved=[false,false,false];state.quizSolved[Number(document.querySelector('#quiz-case').value)]=true;save();renderBooks();renderHome()}});
