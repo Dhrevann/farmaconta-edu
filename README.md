@@ -1,5 +1,17 @@
 # FarmaConta EDU 2.0 — inicio de la migración a la nube
 
+## Estado de preparación para GitHub Pages (20/10/2026)
+
+- **Archivo `config.js`:** ya tiene la URL de Supabase y la clave **publicable** del proyecto. Nunca agregar claves `sb_secret_` ni `service_role`.
+- **Código actualizado:** control de errores de sincronización; advertencia al abandonar la página con datos pendientes; rechazo de datos remotos incompatibles sin borrarlos.
+- **Pruebas locales simuladas:** dos usuarios independientes, escritura de estados, datos remotos incompatibles y error de red **superadas con un cliente Supabase simulado**.
+- **Pruebas reales pendientes:** inicio de sesión Google OAuth, filas RLS en Supabase, continuidad entre dispositivos, 30 usuarios concurrentes y exportación a PDF en dispositivos reales.
+- **GitHub Pages:** este repositorio permanece **privado**. En un plan GitHub Free, el administrador debe cambiarlo a público, revisar previamente la presencia de secretos y activar Pages desde **Settings → Pages → Deploy from a branch → main → /(root)**. En planes GitHub Pro puede conservarse privado.
+- Dirección prevista (aún no comprobada): https://dhrevann.github.io/farmaconta-edu/
+- **Supabase Authentication → URL Configuration:** `Site URL` y `Redirect URLs` deben incluir exactamente la URL anterior. Google Cloud debe tener como OAuth redirect el callback específico de Supabase, no la URL de GitHub.
+- **Antes de clase:** matricular correos autorizados desde el SQL Editor (nunca subirlos a GitHub), y probar con cuentas A/B que no puedan acceder a datos ajenos.
+
+
 ## ¿Qué entrega este paquete?
 
 **Sí implementado (primera iteración):**
