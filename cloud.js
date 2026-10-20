@@ -82,28 +82,45 @@ function queueSnapshot(snapshot) {
 async function flush() {
   if(writing || !pending || cloudBlocked || !currentUserId) return;
   writing=true;
-  while(pending && !cloudBlocked) {
-    const snapshot=pending;
-    pending=null;
-    setSync('Guardando en la nube…','warning');
-    const {data,error}=await client.rpc('save_workspace',{p_data:snapshot,p_expected_revision:revision});
-    if(error){
-      pending=pending||snapshot;
-      const conflict = error.message?.includes('VERSION_CONFLICT');
-      if(conflict){
-        cloudBlocked=true;
-        setSync('Conflicto entre dispositivos. Exporta JSON y vuelve a entrar; no sobrescribiremos el trabajo remoto.','error');
-      } else {
-        setSync('No se pudo sincronizar. Verifica internet y pulsa «Reintentar».','warning');
+  try {
+    while(pending && !cloudBlocked) {
+      const snapshot=pending;
+      pending=null;
+      setSync('Guardando en la nube…','warning');
+      let data, error;
+      try {
+        ({data,error}=await client.rpc('save_workspace',{p_data:snapshot,p_expected_revision:revision}));
+      } catch (failure) { error=failure; }
+      if(error){
+        pending=pending||snapshot;
+        const conflict = error.message?.includes('VERSION_CONFLICT');
+        if(conflict){
+          cloudBlocked=true;
+          setSync('Conflicto entre dispositivos. Exporta JSON y vuelve a entrar; no sobrescribiremos el trabajo remoto.','error');
+        } else {
+          setSync('No se pudo sincronizar. Verifica internet y pulsa «Reintentar».','warning');
+        }
+        break;
       }
-      break;
+      const result=Array.isArray(data)?data[0]:data;
+      if(!Number.isSafeInteger(Number(result?.new_revision)) || Number(result.new_revision) <= revision){
+        pending=pending||snapshot;
+        setSync('Respuesta inesperada del servidor. Revisa el estado antes de continuar.','error');
+        break;
+      }
+      revision=Number(result.new_revision);
+      setSync(pending?'Hay más cambios por sincronizar…':'Guardado correctamente en la nube.');
     }
-    const result=Array.isArray(data)?data[0]:data;
-    revision=Number(result?.new_revision ?? revision+1);
-    setSync(pending?'Hay más cambios por sincronizar…':'Guardado correctamente en la nube.');
-  }
-  writing=false;
+  } finally { writing=false; }
 }
+// Warn students when a cloud write is still in flight. The browser controls the
+// wording of the confirmation dialog; this does not make offline saving reliable.
+window.addEventListener('beforeunload', (event) => {
+  if (pending || writing) {
+    event.preventDefault();
+    event.returnValue = '';
+  }
+});
 retryButton.addEventListener('click',()=>{if(pending&&!cloudBlocked)void flush();});
 loginButton.addEventListener('click',async()=>{
   if(!client)return;
