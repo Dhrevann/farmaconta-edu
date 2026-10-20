@@ -132,6 +132,42 @@ body.app-ready #sync-banner{display:flex;align-items:center;gap:8px}
 @media(max-width:790px){#account-email{display:none}#account-controls{margin-left:0}#logout-btn{font-size:.71rem}}
 @media print{#auth-gate,#sync-banner,#account-controls{display:none!important}}
 
+
+/* Mejora 01: mensajes apilados, sin solaparse en móvil o escritorio. */
+#feedback-stack{
+  position:fixed;
+  right:16px;
+  bottom:calc(16px + env(safe-area-inset-bottom, 0px));
+  width:min(390px,calc(100vw - 32px));
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  z-index:120;
+  pointer-events:none;
+}
+#feedback-stack #sync-banner,
+#feedback-stack #toast{
+  position:static;
+  right:auto;
+  bottom:auto;
+  margin:0;
+  width:100%;
+  max-width:none;
+  box-sizing:border-box;
+  overflow-wrap:anywhere;
+  pointer-events:auto;
+}
+#feedback-stack #toast{z-index:auto}
+@media(max-width:480px){
+  #feedback-stack{
+    right:12px;
+    bottom:calc(12px + env(safe-area-inset-bottom, 0px));
+    width:calc(100vw - 24px);
+    gap:8px;
+  }
+}
+@media print{#feedback-stack{display:none!important}}
+
 </style>
 </head>
 <body>
@@ -146,7 +182,10 @@ body.app-ready #sync-banner{display:flex;align-items:center;gap:8px}
     <p class="auth-foot">Simulación académica · Sin validez tributaria. Acceso exclusivo para estudiantes inscritos.</p>
   </div>
 </div>
-<div id="sync-banner" role="status" aria-live="polite"><span id="sync-message">Conectando…</span><button id="sync-retry" type="button">Reintentar</button></div>
+<div id="feedback-stack" aria-label="Notificaciones de FarmaConta EDU">
+  <div id="sync-banner" role="status" aria-live="polite"><span id="sync-message">Conectando…</span><button id="sync-retry" type="button">Reintentar</button></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</div>
 
 <div class="app" id="app">
   <aside class="sidebar">
@@ -166,7 +205,7 @@ body.app-ready #sync-banner{display:flex;align-items:center;gap:8px}
     <header class="topbar"><div><h1 id="page-title">Panel de aprendizaje</h1><p id="page-subtitle">Tu farmacia, tus decisiones, tus registros</p></div><span class="pill">MODO ACADÉMICO</span></header>
     <main class="workspace">
       <section class="view active" id="view-inicio">
-        <div class="splash"><div><h2>¡Bienvenido al laboratorio contable! 👋</h2><p>Administra una botica ficticia y completa las cuatro sesiones de la III Unidad.<br>Tus datos se guardan únicamente en este navegador.</p></div><span class="emoji" aria-hidden="true">🏥</span></div>
+        <div class="splash"><div><h2>¡Bienvenido al laboratorio contable! 👋</h2><p>Administra una botica ficticia y completa las cuatro sesiones de la III Unidad.<br>Tus datos se sincronizan con tu cuenta cuando el indicador confirma «Guardado correctamente en la nube».</p></div><span class="emoji" aria-hidden="true">🏥</span></div>
         <div class="stats" id="home-stats"></div>
         <div class="grid">
           <article class="card"><h2>Tu avance en la III Unidad</h2><div class="flex-between"><span class="muted tiny">Evidencias prácticas completadas</span><span class="count" id="progress-label">0 / 4</span></div><div class="progress"><div id="progress-bar" style="width:0%"></div></div><div id="home-progress"></div></article>
@@ -225,7 +264,7 @@ body.app-ready #sync-banner{display:flex;align-items:center;gap:8px}
   </div>
 </div>
 <div id="print-root" class="print-root"></div>
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
 <script>
 'use strict';
 const STORAGE_KEY='farmaconta_edu_v1';
