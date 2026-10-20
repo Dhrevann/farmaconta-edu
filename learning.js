@@ -182,7 +182,7 @@ function renderPanel(section){
  feedback(q,panel,saved)+
  '<div class="learn-actions"><button type="button" class="btn" data-learn-action="submit">'+(isExam?'Registrar respuesta':q.type==='written'?'Guardar análisis':'Comprobar y explicar')+'</button><button type="button" class="btn outline" data-learn-action="prev" '+(n<=0?'disabled':'')+'>Anterior</button><button type="button" class="btn outline" data-learn-action="next" '+(n>=questions.length-1?'disabled':'')+'>Siguiente</button><label class="learn-jump">Ir a <select class="learn-select">'+questions.map((item,i)=>'<option value="'+i+'" '+(i===n?'selected':'')+'>'+(i+1)+(p.answers[item.id]?' ✓':'')+'</option>').join('')+'</select></label></div>'+
  (isExam&&panel.exam.responsesCount>=questions.length?'<p class="learn-exam-note">Has registrado diez respuestas. Pulsa «Finalizar evaluación» para ver tu nota.</p><button type="button" class="btn" data-learn-action="finish">Finalizar evaluación /20</button>':'')+
- '<div class="learn-export"><button type="button" class="btn outline" data-learn-action="pdf-own">🖨️ Mis respuestas / PDF</button><button type="button" class="btn outline" data-learn-action="pdf-key" '+(isExam?'disabled title="Termina primero la evaluación"':'')+'>🖨️ Solucionario de 100 preguntas / PDF</button></div>';
+ '<div class="learn-export"><button type="button" class="btn outline" data-learn-action="pdf-own">🖨️ Mis respuestas / PDF</button></div>';
 }
 function switchMode(section,mode){
  const p=panels[section];
@@ -247,15 +247,6 @@ function pdfOwn(){
  if(written.length){body+='<h2>Análisis y decisiones abiertos</h2>';written.forEach((r,i)=>{body+='<div class="avoid-break"><p><b>Actividad '+(i+1)+':</b> '+safe(r.prompt)+'<br><b>Mi respuesta:</b> '+safe(r.answer)+'<br><i>Actividad sujeta a revisión docente.</i></p></div>';});}
  host.print(body);
 }
-function pdfKey(){
- const title=pdfHeader('Guía de resolución del banco formativo');
- let body=title+'<p>Incluye las respuestas y explicaciones de las 100 preguntas. Es una guía de estudio; no un examen protegido. Las actividades reflejan un modelo didáctico de 18 % de IGV en operaciones gravadas.</p>';
- for(const m of Object.keys(modules)){
-  body+='<h2>'+safe(modules[m])+'</h2>';
-  getQuestions(m).forEach((q,i)=>{body+='<div class="avoid-break"><p><b>'+(i+1)+'. '+safe(q.prompt)+'</b><br>Respuesta: <strong>'+safe(String(q.answer))+'</strong><br>Justificación: '+safe(q.explanation)+'</p></div>';});
- }
- host.print(body);
-}
 function openHelp(button){
  const term=button.dataset.helpTerm,record=glossary[term]||glossary['toma de decisiones'];
  if(activeHelp)activeHelp.setAttribute('aria-expanded','false');
@@ -315,7 +306,6 @@ function start(){
   if(action==='submit'){submit(section);return;}
   if(action==='finish'){finish(section);return;}
   if(action==='pdf-own'){pdfOwn();return;}
-  if(action==='pdf-key'){if(p.mode!=='evaluation')pdfKey();return;}
  });
  document.addEventListener('change',ev=>{
   if(ev.target.matches('.learn-select')){const root=ev.target.closest('.learn-card');const p=panelState(root);p.index=Number(ev.target.value)||0;renderPanel(p.section);}
