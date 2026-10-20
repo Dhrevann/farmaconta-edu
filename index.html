@@ -349,7 +349,7 @@ const dec=n=>Math.round((Number(n)||0)*100)/100;
 const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dateLabel=iso=>{let d=new Date(iso);return isNaN(d.getTime())?'Fecha no disponible':d.toLocaleString('es-PE',{dateStyle:'short',timeStyle:'short'});};
 const sum=(list,key)=>dec(list.reduce((a,item)=>a+(typeof key==='function'?key(item):Number(item[key])||0),0));
-const defaultState=()=>({version:1,pharmacy:{name:'',legal:'',ruc:'00000000000',phone:'',address:'',student:'',logo:'',initialCash:3500},products:SEED.map(([id,name,unit,cost,price,stock])=>({id,name,unit,cost,price,stock,initialStock:stock,active:true})),sales:[],expenses:[],counters:{boleta:0,factura:0,nota:0},quizSolved:[false,false,false],analysis:''});
+const defaultState=()=>({version:1,pharmacy:{name:'',legal:'',ruc:'00000000000',phone:'',address:'',student:'',logo:'',initialCash:3500},products:SEED.map(([id,name,unit,cost,price,stock])=>({id,name,unit,cost,price,stock,initialStock:stock,active:true})),sales:[],expenses:[],counters:{boleta:0,factura:0,nota:0},quizSolved:[false,false,false],analysis:'',learning:{version:1,answers:{},attempts:[],written:{}}});
 let state=loadState(),cart=[],active='inicio',logoDraft='';
 function loadState(){return defaultState();}
 function isValid(o){return o&&o.version===1&&o.pharmacy&&typeof o.pharmacy==='object'&&Array.isArray(o.products)&&o.products.length>0&&o.products.length<=150&&o.products.every(p=>typeof p.id==='string'&&typeof p.name==='string'&&Number.isFinite(p.cost)&&p.cost>=0&&Number.isFinite(p.price)&&p.price>=0&&Number.isInteger(p.stock)&&p.stock>=0&&Number.isInteger(p.initialStock)&&p.initialStock>=0&&(p.active===undefined||typeof p.active==='boolean'))&&Array.isArray(o.sales)&&o.sales.length<=10000&&o.sales.every(s=>s&&Array.isArray(s.items)&&['boleta','factura','nota'].includes(s.type)&&Number.isFinite(s.total)&&Number.isFinite(s.net)&&Number.isFinite(s.tax)&&Number.isFinite(s.cost))&&Array.isArray(o.expenses)&&o.expenses.length<=10000&&o.expenses.every(x=>x&&Number.isFinite(x.amount))&&o.counters&&typeof o.analysis==='string'&&o.analysis.length<=20000&&Number.isFinite(o.pharmacy.initialCash)&&o.pharmacy.initialCash>=0&&o.pharmacy.initialCash<=1000000&&(!o.pharmacy.logo||String(o.pharmacy.logo).startsWith('data:image/png;base64,'));}
@@ -368,7 +368,7 @@ function capital(){return dec(state.pharmacy.initialCash+openingInventory())}
 function metrics(){return {sales:totalSales(),net:income(),tax:outputTax(),cost:soldCost(),expenses:totalExpenses(),profit:result(),cash:cashBalance(),stock:stockValue(),capital:capital()}}
 function metric(label,value,detail='',clazz=''){return `<div class="metric"><span>${esc(label)}</span><strong class="${clazz}">${esc(value)}</strong>${detail?`<small>${esc(detail)}</small>`:''}</div>`;}
 function navigate(view){active=view;document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id==='view-'+view));document.querySelectorAll('.nav-btn').forEach(el=>el.classList.toggle('active',el.dataset.view===view));const names={inicio:['Panel de aprendizaje','Tu farmacia, tus decisiones, tus registros'],farmacia:['Mi farmacia','Identidad comercial y capital inicial'],inventario:['Inventario','Catálogo y existencias'],ventas:['Punto de venta','Boletas, facturas y notas de venta simuladas'],gastos:['Gastos operativos','Costos fijos y variables'],contabilidad:['Contabilidad','Libro diario, mayor y balance simplificados'],reportes:['Reportes y entrega','Análisis financiero de la III Unidad']};document.querySelector('#page-title').textContent=names[view][0];document.querySelector('#page-subtitle').textContent=names[view][1];render();window.scrollTo({top:0,behavior:'instant'});}
-function render(){renderHome();renderFarmacia();renderInventory();renderPOS();renderExpenses();renderBooks();renderReports();}
+function render(){renderHome();renderFarmacia();renderInventory();renderPOS();renderExpenses();renderBooks();renderReports();if(window.FarmaLearning)window.FarmaLearning.refresh();}
 function renderHome(){let m=metrics(),p=state.pharmacy,done=[Boolean(p.name.trim())&&state.expenses.length>=2,state.sales.filter(s=>s.type==='boleta').length>=3&&state.sales.filter(s=>s.type==='factura').length>=2,Array.isArray(state.quizSolved)&&state.quizSolved.length===3&&state.quizSolved.every(Boolean),state.analysis.trim().length>=60];let count=done.filter(Boolean).length;
 document.querySelector('#home-stats').innerHTML=metric('Ventas simuladas',money(m.sales),state.sales.length+' operaciones')+metric('Existencias valorizadas',money(m.stock),state.products.length+' productos')+metric('Gastos operativos',money(m.expenses),state.expenses.length+' registros')+metric('Resultado operativo',money(m.profit),'Sin IGV',m.profit>=0?'positive':'negative');
 document.querySelector('#progress-label').textContent=count+' / 4';document.querySelector('#progress-bar').style.width=100*count/4+'%';let names=[['09','Configurar farmacia y registrar al menos dos gastos','farmacia'],['10','Emitir tres boletas y dos facturas simuladas','ventas'],['11','Revisar los libros y resolver tres ejercicios contables','contabilidad'],['12','Redactar al menos 60 caracteres de análisis','reportes']];document.querySelector('#home-progress').innerHTML=names.map((x,i)=>`<div class="checkline"><span class="checkicon ${done[i]?'ok':''}">${done[i]?'✓':x[0]}</span><div><strong class="tiny">${x[1]}</strong><div><button class="btn mini secondary" data-view="${x[2]}" style="margin-top:7px">Abrir sección</button></div></div></div>`).join('');}
@@ -559,8 +559,17 @@ window.farmaRestoreFromCloud=function(remote){
   render();navigate('inicio');
 };
 window.farmaExportCurrent=function(){return JSON.parse(JSON.stringify(state));};
+// API limitada para la capa educativa: utiliza la misma farmacia y sincronización.
+window.farmaLearningHost={
+  getState:()=>state,
+  save:()=>save(),
+  print:body=>printHTML(body),
+  notify:(text)=>toast(text)
+};
 
 </script>
+<script src="./learning-bank.js"></script>
+<script src="./learning.js"></script>
 <script type="module" src="./cloud.js"></script>
 </body>
 </html>

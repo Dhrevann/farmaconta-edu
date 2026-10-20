@@ -104,3 +104,49 @@ Estas funcionalidades están en la rama `mejora/02-ticket-e-inventario` hasta ap
 7. Cerrar sesión, volver a entrar desde otro dispositivo y confirmar que los cambios se recuperan.
 8. Hacer un respaldo JSON antes de una prueba extensa con estudiantes.
 
+
+
+## FarmaConta EDU 2.1 — Centro de aprendizaje interactivo
+
+**Módulos existentes conservados:** personalización de farmacia, inventario, facturación ficticia, tickets 58/80 mm, gastos, libros contables, reportes, Google OAuth y Supabase.
+
+### ¿Qué se agregó?
+
+- **100 ejercicios explicados**, repartidos en 5 temáticas: Finanzas (25), Ventas (20), Inventario (20), Contabilidad (25), Reportes (10).
+- Aparecen en **Mi farmacia, Gastos, Punto de venta, Inventario, Contabilidad y Reportes**; las preguntas de educación financiera se comparten entre Mi farmacia y Gastos.
+- **43 conceptos con ayuda (?)** contextual. En computadoras: pasar el cursor o pulsar; en celulares: tocar. La ayuda describe el concepto y añade fórmula o regla cuando corresponda.
+- **Modo práctica:** repetir preguntas y recibir explicación inmediata.
+- **Modo desafío:** un cálculo personalizado y **tres casos abiertos** por temática, vinculados a indicadores de **tu farmacia actual**: 5 cálculos y 15 análisis adicionales. Los casos abiertos requieren evaluación docente. El caso abierto es para revisión docente, sin nota automática.
+- **Modo evaluación:** 10 preguntas aleatorias de la temática; muestra una nota formativa de **0 a 20** al finalizar. No constituye un examen supervisado o antifraude, porque las preguntas se entregan públicamente al navegador.
+- **Panel de progreso** en Inicio, con acceso directo a cada bloque.
+- **Reportes PDF desde impresión de navegador**: «Mis respuestas» incluye preguntas contestadas, respuestas, explicaciones, evaluaciones terminadas y análisis abiertos; «Solucionario» incluye las 100 preguntas y sus soluciones con método de cálculo. En el diálogo de impresión seleccionar **Guardar como PDF**.
+
+### Uso docente (flujo recomendado)
+
+1. Sesión 09: configurar botica, registrar al menos 2 gastos y resolver **Finanzas**.
+2. Sesión 10: emitir comprobantes ficticios y resolver **Ventas**.
+3. Sesión 11: ajustar inventario, visualizar libro diario/mayor, resolver **Inventario** y **Contabilidad**.
+4. Sesión 12: analizar reportes, resolver **Reportes** y completar **Desafío de mi farmacia**.
+5. Cada estudiante imprime el **PDF de sus respuestas** como evidencia. El **solucionario completo** es material de estudio y deberá usarse según las reglas de clase.
+
+### Persistencia y privacidad
+
+- El progreso se integra en `state.learning` dentro del **mismo workspace individual** ya existente y se guarda mediante `save_workspace` en Supabase.
+- Los JSON anteriores son compatibles: si todavía no contienen `learning`, se crea cuando el estudiante abra una actividad.
+- **No hay que ejecutar otro SQL** para esta ampliación.
+- Las respuestas se guardan en la nube al completar preguntas, evaluaciones o análisis; **espera el indicador «Guardado correctamente en la nube»** antes de cerrar la pestaña.
+- La clave publicable del navegador no otorga por sí sola acceso a datos de otro estudiante; es esencial conservar las políticas RLS existentes.
+- Se trata de cálculos didácticos, con supuesto de **18 % de IGV en los ejemplos gravados**. No sustituye la normativa de SUNAT ni el criterio del docente. Los reactivos no están validados psicométricamente: requieren revisión académica para evaluación formal.
+
+### Pruebas de aceptación para la PR 2.1
+
+- Ingresar con cuenta A; responder Finanzas y comprobar que el progreso aparezca en Inicio y Gastos.
+- Confirmar que una respuesta correcta e incorrecta muestren retroalimentación explicativa.
+- Pasar el cursor sobre (?) y tocarlo en celular; comprobar definiciones y fórmulas y cierre con tecla Esc.
+- En Desafío, verificar que los cálculos cambien al registrar una nueva venta.
+- Completar 10 preguntas del modo Evaluación y verificar calificación sobre 20, incluyendo el detalle del intento en el PDF personal.
+- Abrir los dos PDF: «Mis respuestas» y «Solucionario 100», guardarlos como PDF, comprobar caracteres, cálculos y saltos de página.
+- Cerrar sesión, volver a entrar y recuperar respuestas/nota desde Supabase.
+- Ingresar con cuenta B y comprobar que sus respuestas no incluyen las de A.
+- Verificar que comprobantes A4, ticket térmico, inventario y balance siguen funcionando.
+
