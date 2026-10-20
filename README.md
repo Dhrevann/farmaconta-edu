@@ -116,7 +116,7 @@ Estas funcionalidades están en la rama `mejora/02-ticket-e-inventario` hasta ap
 - Aparecen en **Mi farmacia, Gastos, Punto de venta, Inventario, Contabilidad y Reportes**; las preguntas de educación financiera se comparten entre Mi farmacia y Gastos.
 - **43 conceptos con ayuda (?)** contextual. En computadoras: pasar el cursor o pulsar; en celulares: tocar. La ayuda describe el concepto y añade fórmula o regla cuando corresponda.
 - **Modo práctica:** repetir preguntas y recibir explicación inmediata.
-- **Modo desafío:** un cálculo y un caso de análisis abierto a partir de datos de **tu farmacia actual** por temática. El caso abierto es para revisión docente, sin nota automática.
+- **Modo desafío:** un cálculo personalizado y **tres casos abiertos** por temática, vinculados a indicadores de **tu farmacia actual**: 5 cálculos y 15 análisis adicionales. Los casos abiertos requieren evaluación docente. El caso abierto es para revisión docente, sin nota automática.
 - **Modo evaluación:** 10 preguntas aleatorias de la temática; muestra una nota formativa de **0 a 20** al finalizar. No constituye un examen supervisado o antifraude, porque las preguntas se entregan públicamente al navegador.
 - **Panel de progreso** en Inicio, con acceso directo a cada bloque.
 - **Reportes PDF desde impresión de navegador**: «Mis respuestas» incluye preguntas contestadas, respuestas, explicaciones, evaluaciones terminadas y análisis abiertos; «Solucionario» incluye las 100 preguntas y sus soluciones con método de cálculo. En el diálogo de impresión seleccionar **Guardar como PDF**.
@@ -144,7 +144,7 @@ Estas funcionalidades están en la rama `mejora/02-ticket-e-inventario` hasta ap
 - Confirmar que una respuesta correcta e incorrecta muestren retroalimentación explicativa.
 - Pasar el cursor sobre (?) y tocarlo en celular; comprobar definiciones y fórmulas y cierre con tecla Esc.
 - En Desafío, verificar que los cálculos cambien al registrar una nueva venta.
-- Completar 10 preguntas del modo Evaluación y verificar calificación sobre 20.
+- Completar 10 preguntas del modo Evaluación y verificar calificación sobre 20, incluyendo el detalle del intento en el PDF personal.
 - Abrir los dos PDF: «Mis respuestas» y «Solucionario 100», guardarlos como PDF, comprobar caracteres, cálculos y saltos de página.
 - Cerrar sesión, volver a entrar y recuperar respuestas/nota desde Supabase.
 - Ingresar con cuenta B y comprobar que sus respuestas no incluyen las de A.
