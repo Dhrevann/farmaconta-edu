@@ -335,7 +335,11 @@ function renderCartTotalsOnly(){let t=cartTotals();document.querySelector('#cart
 initQuiz();fillPharmacyForm();document.querySelector('#student-analysis').value=state.analysis;attach();render();
 // Interface for the cloud adapter (the legacy accounting calculations remain intact).
 window.farmaRestoreFromCloud=function(remote){
-  state=remote&&isValid(remote)?remote:defaultState();
+  // Never silently overwrite a damaged or incompatible remote workspace.
+  if (remote !== null && !isValid(remote)) {
+    throw new Error('La farmacia guardada tiene un formato incompatible. No se reemplazó su información; consulta al docente.');
+  }
+  state=remote ?? defaultState();
   cart=[];logoDraft='';fillPharmacyForm();
   document.querySelector('#student-analysis').value=state.analysis||'';
   render();navigate('inicio');
